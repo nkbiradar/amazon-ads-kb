@@ -95,6 +95,13 @@
       "description": "Holiday and seasonal marketing strategies with sponsored ads",
       "enabled": true,
       "verified": "2026-08-10T18:00:00Z"
+    },
+    {
+      "url": "https://advertising.amazon.com/this-page-does-not-exist-12345",
+      "source_type": "official",
+      "description": "Broken URL for pipeline error handling test",
+      "enabled": false,
+      "verified": "2026-08-11T00:00:00Z"
     }
   ]
 }

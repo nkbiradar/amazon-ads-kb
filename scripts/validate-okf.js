@@ -6,14 +6,31 @@
  * Validates that a file has proper OKF v0.1 frontmatter before allowing writes.
  * Called by PreToolUse hook for knowledge/ directory writes.
  *
- * Usage: node validate-okf.js <file_content>
+ * Usage: node validate-okf.js <file_path>
  * Returns: 0 if valid, 1 if invalid
  */
 
 const fs = require('fs');
+const path = require('path');
 
-// Get file content from command line argument
-const fileContent = process.argv[2] || '';
+// Get file path from command line argument
+const filePath = process.argv[2];
+
+// Check if file path was provided
+if (!filePath) {
+  console.error('Error: No file path provided');
+  console.error('Usage: node validate-okf.js <file_path>');
+  process.exit(1);
+}
+
+// Read file content
+let fileContent;
+try {
+  fileContent = fs.readFileSync(filePath, 'utf8');
+} catch (error) {
+  console.error(`Error: Cannot read file '${filePath}': ${error.message}`);
+  process.exit(1);
+}
 
 function validateOKFFrontmatter(content) {
   const errors = [];
@@ -56,10 +73,11 @@ function validateOKFFrontmatter(content) {
   if (!fields.last_updated) {
     errors.push('Missing required field: last_updated');
   } else {
-    // Validate ISO 8601 timestamp format
-    const isoPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
-    if (!isoPattern.test(fields.last_updated.replace(/"/g, ''))) {
-      errors.push('Invalid last_updated format (must be ISO 8601: YYYY-MM-DDTHH:mm:ssZ)');
+    // Validate ISO 8601 date or timestamp format
+    // Accepts both: YYYY-MM-DD and YYYY-MM-DDTHH:mm:ssZ
+    const datePattern = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}Z)?$/;
+    if (!datePattern.test(fields.last_updated.replace(/"/g, ''))) {
+      errors.push('Invalid last_updated format (must be ISO 8601 date: YYYY-MM-DD or timestamp: YYYY-MM-DDTHH:mm:ssZ)');
     }
   }
 
@@ -73,14 +91,15 @@ function validateOKFFrontmatter(content) {
       errors.push('Invalid sources array format');
     } else {
       // Validate each source entry
-      const sourceEntries = frontmatter.match(/-\s*url:\s*["']([^"']+)["']\s*\ntype:\s*(\w+)\s*\nconfidence:\s*(\w+)/g);
+      // Regex handles YAML indentation: optional leading whitespace on each line
+      const sourceEntries = frontmatter.match(/-\s*url:\s*["']([^"']+)["']\s*\n\s*type:\s*["']?(\w+)["']?\s*\n\s*confidence:\s*["']?(\w+)["']?/g);
       if (!sourceEntries || sourceEntries.length === 0) {
         errors.push('Sources array must contain at least one source with url, type, and confidence');
       } else {
         sourceEntries.forEach(entry => {
           const urlMatch = entry.match(/url:\s*["']([^"']+)["']/);
-          const typeMatch = entry.match(/type:\s*(\w+)/);
-          const confMatch = entry.match(/confidence:\s*(\w+)/);
+          const typeMatch = entry.match(/type:\s*["']?(\w+)["']?/);
+          const confMatch = entry.match(/confidence:\s*["']?(\w+)["']?/);
 
           if (!urlMatch || !urlMatch[1]) {
             errors.push('Source missing required field: url');
@@ -101,8 +120,56 @@ function validateOKFFrontmatter(content) {
   return errors;
 }
 
+function validateOKFBody(content, errors) {
+  // Extract content body (after frontmatter)
+  const frontmatterEnd = content.indexOf('---', 3);
+  if (frontmatterEnd === -1) {
+    // Already caught in frontmatter validation
+    return;
+  }
+
+  const bodyStart = frontmatterEnd + 3; // Skip the closing '---'
+  const body = content.substring(bodyStart).trim();
+
+  // Check for content body
+  if (!body || body.length === 0) {
+    errors.push('Missing content body (document must have content after frontmatter)');
+    return;
+  }
+
+  // Extract source URLs from frontmatter for citation validation
+  const frontmatter = content.substring(3, frontmatterEnd).trim();
+  const sourceUrls = [];
+  const urlMatches = frontmatter.matchAll(/url:\s*["']([^"']+)["']/g);
+  for (const match of urlMatches) {
+    sourceUrls.push(match[1]);
+  }
+
+  // Validate citation format and URLs
+  // Citations should use Unicode superscript format: [¹](url)
+  const citationPattern = /\[¹\]\(([^)]+)\)/g;
+  const invalidCitationPattern = /\[\d+\]\(([^)]+)\)/g; // Regular numbers [1], [2], etc.
+
+  // Check for malformed citations (using regular numbers instead of superscript)
+  const invalidMatches = body.matchAll(invalidCitationPattern);
+  for (const match of invalidMatches) {
+    errors.push('Invalid citation format: must use Unicode superscript [¹] not regular numbers [1], [2], etc.');
+    break; // Only report once for this error type
+  }
+
+  // Check that all citation URLs are defined in sources
+  const validMatches = body.matchAll(citationPattern);
+  for (const match of validMatches) {
+    const citationUrl = match[1];
+    if (!sourceUrls.includes(citationUrl)) {
+      errors.push(`Citation URL not defined in sources array: ${citationUrl}`);
+    }
+  }
+}
+
 // Run validation
 const errors = validateOKFFrontmatter(fileContent);
+validateOKFBody(fileContent, errors);
 
 if (errors.length > 0) {
   // Output errors to stderr
