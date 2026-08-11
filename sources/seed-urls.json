@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "description": "Seed URLs for Amazon Ads knowledge acquisition pipeline",
+    "last_updated": "2026-08-10T18:00:00Z"
+  },
+  "seeds": [
+    {
+      "url": "https://advertising.amazon.com/help",
+      "source_type": "official",
+      "description": "Amazon Ads official Help Center and documentation",
+      "enabled": true,
+      "verified": "2026-08-10T15:30:00Z"
+    },
+    {
+      "url": "https://github.com/amzn/ads-advanced-tools-docs",
+      "source_type": "community",
+      "description": "Official Amazon Ads API GitHub repository with code samples and documentation",
+      "enabled": true,
+      "verified": "2026-08-10T15:30:00Z"
+    },
+    {
+      "url": "https://myamazonguy.com/advertising/amazon-ppc-guide-2026-campaign-strategies/",
+      "source_type": "blog",
+      "description": "My Amazon Guy - Comprehensive Amazon PPC guide with strategies and best practices",
+      "enabled": true,
+      "verified": "2026-08-10T15:30:00Z"
+    },
+    {
+      "url": "https://advertising.amazon.com/solutions/products/sponsored-products",
+      "source_type": "official",
+      "description": "Amazon Ads official Sponsored Products documentation and guide",
+      "enabled": true,
+      "verified": "2026-08-10T17:00:00Z"
+    },
+    {
+      "url": "https://advertising.amazon.com/solutions/products/amazon-dsp",
+      "source_type": "official",
+      "description": "Amazon DSP demand-side platform for programmatic advertising",
+      "enabled": true,
+      "verified": "2026-08-10T18:00:00Z"
+    },
+    {
+      "url": "https://advertising.amazon.com/library/guides/display-ads-guide",
+      "source_type": "official",
+      "description": "Complete guide to Sponsored Display ads and targeting options",
+      "enabled": true,
+      "verified": "2026-08-10T18:00:00Z"
+    },
+    {
+      "url": "https://advertising.amazon.com/en-ca/library/guides/basics-of-amazon-attribution",
+      "source_type": "official",
+      "description": "Amazon Attribution tracking and measurement for cross-channel insights",
+      "enabled": true,
+      "verified": "2026-08-10T18:00:00Z"
+    },
+    {
+      "url": "https://advertising.amazon.com/solutions/products/amazon-marketing-cloud",
+      "source_type": "official",
+      "description": "Amazon Marketing Cloud data clean room for advertising analytics",
+      "enabled": true,
+      "verified": "2026-08-10T18:00:00Z"
+    },
+    {
+      "url": "https://advertising.amazon.com/help/GTEHPEG5BXY9UX5W",
+      "source_type": "official",
+      "description": "Negative keywords and negative product targeting guide",
+      "enabled": true,
+      "verified": "2026-08-10T18:00:00Z"
+    },
+    {
+      "url": "https://advertising.amazon.com/solutions/products/stores",
+      "source_type": "official",
+      "description": "Amazon Brand Stores for brand building and product showcase",
+      "enabled": true,
+      "verified": "2026-08-10T18:00:00Z"
+    },
+    {
+      "url": "https://advertising.amazon.com/library/guides/dynamic-bidding-sponsored-products",
+      "source_type": "official",
+      "description": "Dynamic bidding strategies and optimization for Sponsored Products",
+      "enabled": true,
+      "verified": "2026-08-10T18:00:00Z"
+    },
+    {
+      "url": "https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics",
+      "source_type": "official",
+      "description": "Amazon Ads reporting metrics and performance measurement",
+      "enabled": true,
+      "verified": "2026-08-10T18:00:00Z"
+    },
+    {
+      "url": "https://advertising.amazon.com/library/guides/guide-to-holiday-marketing-with-sponsored-ads",
+      "source_type": "official",
+      "description": "Holiday and seasonal marketing strategies with sponsored ads",
+      "enabled": true,
+      "verified": "2026-08-10T18:00:00Z"
+    }
+  ]
+}

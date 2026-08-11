@@ -1,0 +1,2 @@
+# Claude Code settings - exclude from version control
+.claude/settings.json
