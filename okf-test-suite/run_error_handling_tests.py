@@ -97,7 +97,7 @@ def main():
         expected_str = "PASS" if expect_pass else "FAIL"
         actual_str = "PASS" if actual_pass else "FAIL"
         match = actual_pass == expect_pass
-        result_str = "✓ correct" if match else "✗ WRONG"
+        result_str = "PASS" if match else "FAIL"
 
         if match:
             correct += 1
@@ -119,7 +119,7 @@ def main():
         print()
         sys.exit(1)
     else:
-        print("All error-handling cases behaved as expected. ✅")
+        print("All error-handling cases behaved as expected. PASS")
         sys.exit(0)
 
 
