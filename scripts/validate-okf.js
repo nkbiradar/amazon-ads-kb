@@ -86,13 +86,16 @@ function validateOKFFrontmatter(content) {
     errors.push('Missing required field: sources array');
   } else {
     // Validate sources array structure
-    const sourcesMatch = frontmatter.match(/sources:\s*\n((?:\s*-\s*url:.*\n(?:\s*type:.*\n(?:\s*confidence:.*\n)?)?)+)/);
+    // Fixed: Allow other fields (like topic_id) to come after sources array
+    // Fixed: Handle both Unix (\n) and Windows (\r\n) line endings
+    const sourcesMatch = frontmatter.match(/sources:\s*\r?\n((?:\s*-\s*url:.*\r?\n\s*type:.*\r?\n\s*confidence:.*\r?\n?)+)/);
     if (!sourcesMatch) {
       errors.push('Invalid sources array format');
     } else {
       // Validate each source entry
       // Regex handles YAML indentation: optional leading whitespace on each line
-      const sourceEntries = frontmatter.match(/-\s*url:\s*["']([^"']+)["']\s*\n\s*type:\s*["']?(\w+)["']?\s*\n\s*confidence:\s*["']?(\w+)["']?/g);
+      // Fixed: Handle both Unix (\n) and Windows (\r\n) line endings
+      const sourceEntries = frontmatter.match(/-\s*url:\s*["']([^"']+)["']\s*\r?\n\s*type:\s*["']?(\w+)["']?\s*\r?\n\s*confidence:\s*["']?(\w+)["']?/g);
       if (!sourceEntries || sourceEntries.length === 0) {
         errors.push('Sources array must contain at least one source with url, type, and confidence');
       } else {

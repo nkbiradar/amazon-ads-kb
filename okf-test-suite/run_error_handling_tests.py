@@ -26,7 +26,9 @@ from pathlib import Path
 # Example if it's a python script: ["python", "validate_okf.py"]
 # Example if it's a node script:   ["node", "validate_okf.js"]
 # Example if it's a Claude Code agent/CLI wrapper, replace accordingly.
-VALIDATOR_CMD = ["node", "../scripts/validate-okf.js"]
+# Get the repository root by going up from the test suite directory
+REPO_ROOT = Path(__file__).parent.parent
+VALIDATOR_CMD = ["node", str(REPO_ROOT / "scripts" / "validate-okf.js")]
 # -------------------------
 
 TEST_DIR = Path(__file__).parent / "test-cases"

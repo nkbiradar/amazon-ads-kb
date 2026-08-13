@@ -214,8 +214,14 @@ def main():
     # Print status for calling process
     print(status)
 
-    # Update database (comment out if you only want to check)
-    # update_source_entry(url, content, status)
+    # Update database with the new hash and metadata
+    # Determine source_type - for new sources, default to "official" unless otherwise specified
+    source_type = "official"
+    db = load_sources_db()
+    if url in db.get("sources", {}):
+        source_type = db["sources"][url].get("source_type", "official")
+
+    update_source_entry(url, content, status, source_type)
 
 
 if __name__ == "__main__":

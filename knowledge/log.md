@@ -258,3 +258,20 @@
 - Documents updated: 0
 
 ---
+
+## Pipeline Run: 2026-08-13T08:46:38Z
+
+**Duration**: 25.67 seconds
+**Sources Processed**: 13
+**Sources Skipped**: 0
+**Sources Failed**: 0
+
+**Statistics**:
+- Facts extracted: 19
+- Facts new: 9
+- Facts duplicate: 4
+- Facts conflict-resolved: 6
+- Documents created: 0
+- Documents updated: 18
+
+---
