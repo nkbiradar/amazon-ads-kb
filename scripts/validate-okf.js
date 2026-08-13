@@ -57,6 +57,10 @@ function validateOKFFrontmatter(content) {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith('#')) continue;
 
+    // Skip array items (lines starting with '-') and nested properties (indented lines)
+    if (trimmed.startsWith('-')) continue;
+    if (line !== line.trimLeft()) continue; // Skip indented lines (nested properties)
+
     const colonPos = trimmed.indexOf(':');
     if (colonPos === -1) continue;
 
@@ -79,6 +83,18 @@ function validateOKFFrontmatter(content) {
     if (!datePattern.test(fields.last_updated.replace(/"/g, ''))) {
       errors.push('Invalid last_updated format (must be ISO 8601 date: YYYY-MM-DD or timestamp: YYYY-MM-DDTHH:mm:ssZ)');
     }
+  }
+
+  // Validate document-level type field
+  if (!fields.type) {
+    errors.push('Missing required field: type');
+  } else {
+    // Remove quotes and check if empty
+    const typeValue = fields.type.replace(/"/g, '').trim();
+    if (!typeValue) {
+      errors.push('Document-level type field cannot be empty');
+    }
+    // Accept any non-empty value for now (knowledge, guide, reference, etc.)
   }
 
   // Check for sources array

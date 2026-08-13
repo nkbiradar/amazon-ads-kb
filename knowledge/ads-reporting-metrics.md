@@ -1,6 +1,7 @@
 ---
 title: "Amazon Ads Reporting Metrics and Measurement"
 last_updated: 2026-08-10T18:30:00Z
+type: knowledge
 sources:
   - url: "https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics"
     type: official
@@ -13,6 +14,7 @@ topic_id: ads-reporting-metrics
 ## Overview
 
 Amazon Ads provides comprehensive reporting metrics to measure campaign performance, optimize strategies, and demonstrate return on advertising investment. Every report in the Ads API is composed of metrics that you specify to include in your report requests. [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ## Metric Categories
 
@@ -23,6 +25,7 @@ Measure how customers interact with your ads:
 - **Click-through rate (CTR)**: Percentage of impressions that resulted in clicks
 - **Viewable impressions**: Times ad was seen by users
 - **View-through rate**: Percentage of viewable impressions [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Sales Metrics
 Track revenue and conversion performance:
@@ -31,6 +34,7 @@ Track revenue and conversion performance:
 - **Units sold**: Total quantity of products sold
 - **Conversion rate**: Percentage of clicks that resulted in purchases
 - **Add to cart**: Products added to shopping carts [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Cost Metrics
 Monitor advertising spend and efficiency:
@@ -39,6 +43,7 @@ Monitor advertising spend and efficiency:
 - **Cost-per-acquisition (CPA)**: Average cost per order
 - **Advertising cost of sales (ACOS)**: Ad spend as percentage of sales
 - **Return on ad spend (ROAS)**: Revenue generated per ad dollar spent [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Brand Metrics
 Measure brand impact and new customer acquisition:
@@ -47,6 +52,7 @@ Measure brand impact and new customer acquisition:
 - **Brand new-to-brand (NTB)**: Customers new to your brand
 - **Detail page view rate (DPVR)**: Percentage of views that resulted in product page visits
 - **Add-to-list (ATL)**: Products added to shopping lists [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ## Report Types and Levels
 
@@ -56,6 +62,7 @@ Aggregate metrics across entire campaigns:
 - Budget utilization
 - Overall return on investment
 - Cross-campaign comparison [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Ad Group-Level Reports
 Metrics for specific ad groups:
@@ -63,6 +70,7 @@ Metrics for specific ad groups:
 - Keyword group performance
 - Product targeting results
 - Creative performance by ad group [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Keyword and Product Targeting Reports
 Detailed performance at targeting level:
@@ -70,6 +78,7 @@ Detailed performance at targeting level:
 - Product targeting performance
 - Search term performance
 - Placement performance by target [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Ad-Level Reports
 Performance of specific ad creatives:
@@ -77,6 +86,7 @@ Performance of specific ad creatives:
 - Video vs image ad performance
 - Headline and description testing results
 - Asset performance analysis [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ## Advanced Metrics
 
@@ -85,12 +95,14 @@ Performance of specific ad creatives:
 - **Frequency**: Average times users saw your ads
 - **Impression share**: Percentage of available impressions captured
 - **Unique reach**: Distinct individuals reached [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Viewability Metrics
 - **Viewable impressions**: Ads actually seen by users
 - **View-through rate**: Percentage of viewable impressions
 - **Video completion rates**: For video ad formats
 - **Audio completion rates**: For audio ad formats [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Placement Metrics
 Performance by ad placement:
@@ -98,6 +110,7 @@ Performance by ad placement:
 - **Product pages**: Performance on product detail pages
 - **Rest of search**: Other search result positions
 - **Third-party placements**: Off-Amazon performance [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ## Reporting API Structure
 
@@ -108,6 +121,7 @@ Every report requires:
 - **Date range**: Time period for data
 - **Filters**: Specific data segmentation
 - **Grouping**: How to aggregate results [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Available Report Types
 - **Campaign reports**: Overall campaign performance
@@ -115,6 +129,7 @@ Every report requires:
 - **Keyword reports**: Search term and keyword performance
 - **Targeting reports**: Product targeting performance
 - **Ad reports**: Creative and asset performance [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ## Performance Analysis
 
@@ -124,6 +139,7 @@ Track metrics over time to identify:
 - Performance improvement trends
 - Cost efficiency changes
 - Market condition impacts [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Comparative Analysis
 Compare performance across:
@@ -131,6 +147,7 @@ Compare performance across:
 - Time periods (week over week, month over month)
 - Product categories and segments
 - Geographic markets [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Optimization Opportunities
 Use metrics to identify:
@@ -139,6 +156,7 @@ Use metrics to identify:
 - Efficient bid strategies
 - Budget allocation opportunities
 - Audience segment performance [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ## Custom Reporting
 
@@ -149,6 +167,7 @@ Customize reports with:
 - **Segmentation**: Break down by dimensions
 - **Filters**: Focus on specific data subsets
 - **Formatting**: Structure for analysis needs [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Automated Reporting
 Set up:
@@ -156,6 +175,7 @@ Set up:
 - **Alert triggers**: Performance threshold notifications
 - **Custom dashboards**: Real-time monitoring
 - **Data exports**: External analysis integration [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ## Best Practices
 
@@ -165,6 +185,7 @@ Focus on metrics that matter:
 - **Efficiency metrics**: ROAS, ACOS, CPA
 - **Growth metrics**: NTB, market share
 - **Brand metrics**: Awareness, consideration [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Data Quality
 Ensure reliable metrics by:
@@ -173,6 +194,7 @@ Ensure reliable metrics by:
 - Considering attribution windows
 - Accounting for seasonal variations
 - Monitoring for data anomalies [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Regular Review Process
 Establish consistent analysis:
@@ -180,6 +202,7 @@ Establish consistent analysis:
 - **Weekly reviews**: Performance trend analysis
 - **Monthly deep-dives**: Comprehensive performance analysis
 - **Quarterly assessments**: Strategy and planning reviews [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ## Integration with Analytics
 
@@ -189,6 +212,7 @@ Combine Amazon Ads metrics with:
 - Cross-channel attribution
 - Customer journey mapping
 - Advanced analytics and modeling [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Third-Party Tools
 Integrate with:
@@ -196,6 +220,7 @@ Integrate with:
 - Custom dashboards and visualizations
 - Automated reporting systems
 - Data warehousing solutions [¹](https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics)
+<!-- provenance: source_url="https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ## Related Topics
 

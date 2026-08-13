@@ -1,6 +1,7 @@
 ---
 title: "Valid Control Document"
 last_updated: "2026-08-11"
+type: knowledge
 sources:
   - url: "https://advertising.amazon.com/help"
     type: "official"

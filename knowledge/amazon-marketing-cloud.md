@@ -1,6 +1,7 @@
 ---
 title: "Amazon Marketing Cloud Data Clean Room"
 last_updated: 2026-08-10T18:30:00Z
+type: knowledge
 sources:
   - url: "https://advertising.amazon.com/solutions/products/amazon-marketing-cloud"
     type: official
@@ -13,6 +14,7 @@ topic_id: amazon-marketing-cloud
 ## Overview
 
 Amazon Marketing Cloud (AMC) is a secure, privacy-safe, and cloud-based clean room solution that enables advertising analytics and insights through secure data collaboration and enhanced audience discovery without moving data. [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ## What is Amazon Marketing Cloud?
 
@@ -21,6 +23,7 @@ AMC provides advertisers with a comprehensive solution for:
 - Enhanced advertising insights
 - Audience discovery and activation
 - Secure analytics without data movement [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ## Core Capabilities
 
@@ -30,6 +33,7 @@ AMC uses AWS Clean Rooms technology to enable:
 - Privacy-safe data analysis
 - Enhanced insights without data movement
 - Confidential computing environments [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Advanced Analytics
 Perform sophisticated analytics including:
@@ -38,6 +42,7 @@ Perform sophisticated analytics including:
 - Cross-channel attribution
 - Audience segmentation and discovery
 - Campaign performance optimization [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ## Integration with Amazon Ecosystem
 
@@ -47,6 +52,7 @@ AMC integrates with other Amazon systems:
 - Amazon Publisher Cloud
 - Amazon Ads platforms
 - Third-party data partners [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### End-to-End Campaign Management
 Integration eliminates fragmentation in:
@@ -54,6 +60,7 @@ Integration eliminates fragmentation in:
 - Media buying
 - Performance measurement
 - Attribution analysis [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ## Key Features
 
@@ -63,6 +70,7 @@ AMC enables comprehensive measurement while maintaining customer privacy through
 - Anonymized insights
 - Secure data environments
 - Compliance with privacy regulations [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Event-Level Data Access
 Access detailed event-level datasets for:
@@ -70,6 +78,7 @@ Access detailed event-level datasets for:
 - Advanced segmentation analysis
 - Machine learning model training
 - Predictive analytics applications [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Audience Discovery
 Discover and create high-value audience segments based on:
@@ -77,6 +86,7 @@ Discover and create high-value audience segments based on:
 - Browsing patterns
 - Streaming preferences
 - Cross-platform activities [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ## Use Cases and Applications
 
@@ -85,18 +95,21 @@ Discover and create high-value audience segments based on:
 - Channel planner for inventory simulation
 - Real-time budget optimization based on live inventory
 - Reach and frequency modeling [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Performance Measurement
 - Holistic cross-channel impact analysis
 - Omnichannel metrics (OCM)
 - Marketing mix modeling (MMM)
 - Custom analytics across campaigns [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Audience Activation
 - Create custom audience segments
 - Activate across Amazon DSP and other platforms
 - Retargeting based on comprehensive insights
 - Lookalike audience modeling [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ## Data Privacy and Security
 
@@ -106,6 +119,7 @@ AMC ensures data security through:
 - No data movement between parties
 - Privacy-safe computation methods
 - AWS security infrastructure [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Privacy Compliance
 Built to comply with:
@@ -113,6 +127,7 @@ Built to comply with:
 - Industry privacy standards
 - Amazon's privacy policies
 - Customer data protection requirements [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ## Getting Started with AMC
 
@@ -121,6 +136,7 @@ Built to comply with:
 - Event-level data integration
 - User population and configuration
 - Data partnership agreements [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Implementation Process
 1. **Set up AMC account** and configure data sources
@@ -128,6 +144,7 @@ Built to comply with:
 3. **Configure data partnerships** for collaborative analysis
 4. **Build custom analytics** using AMC tools
 5. **Activate insights** across advertising platforms [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ## Analytics Capabilities
 
@@ -136,12 +153,14 @@ Built to comply with:
 - Audience segmentation insights
 - Cross-channel attribution
 - Purchase journey analysis [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Advanced Analytics
 - Machine learning model development
 - Predictive analytics applications
 - Custom visualization creation
 - Automated reporting and alerting [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ## Integration with Amazon DSP
 
@@ -151,6 +170,7 @@ AMC insights can improve Amazon DSP performance through:
 - Improved targeting accuracy
 - Enhanced bid optimization
 - More efficient budget allocation [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Measurement Integration
 Combine AMC analytics with Amazon DSP reporting for:
@@ -158,6 +178,7 @@ Combine AMC analytics with Amazon DSP reporting for:
 - Holistic impact measurement
 - Cross-platform insights
 - Unified campaign optimization [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ## Technical Architecture
 
@@ -167,6 +188,7 @@ Built on AWS technology for:
 - Secure data storage
 - Advanced analytics capabilities
 - Reliable performance [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Data Integration
 Supports integration with:
@@ -174,6 +196,7 @@ Supports integration with:
 - Third-party data providers
 - Amazon advertising platforms
 - External marketing technologies [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ## Business Value
 
@@ -182,12 +205,14 @@ Supports integration with:
 - Enhanced targeting precision
 - Reduced wasted ad spend
 - Improved return on ad spend [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ### Enhanced Customer Understanding
 - Comprehensive customer journey mapping
 - Cross-platform behavior analysis
 - Purchase pattern recognition
 - Engagement optimization [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ## Related Topics
 

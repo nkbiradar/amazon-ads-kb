@@ -1,127 +1,107 @@
 {
-  "metadata": {
-    "version": "1.0",
-    "description": "Source tracking database for Amazon Ads knowledge base",
-    "last_updated": "2026-08-13T08:47:04Z",
-    "total_sources": 13
-  },
   "sources": {
-    "https://advertising.amazon.com/help": {
-      "url": "https://advertising.amazon.com/help",
-      "content_hash": "d7225ddef9b1cbc979a2704cd464ef293de76d983e78a8db699c88319067f24d",
-      "last_checked": "2026-08-13T08:46:42Z",
-      "last_changed": "2026-08-13T08:46:42Z",
-      "source_type": "official",
-      "fetch_count": 2,
-      "change_count": 1
-    },
-    "https://github.com/amzn/ads-advanced-tools-docs": {
-      "url": "https://github.com/amzn/ads-advanced-tools-docs",
-      "content_hash": "80f7663d7477843593fc9f1ef3a2b64ffed2e538970532f2978b588926eebced",
-      "last_checked": "2026-08-13T08:46:46Z",
-      "last_changed": "2026-08-13T08:46:46Z",
-      "source_type": "community",
-      "fetch_count": 2,
-      "change_count": 1
-    },
-    "https://myamazonguy.com/advertising/amazon-ppc-guide-2026-campaign-strategies/": {
-      "url": "https://myamazonguy.com/advertising/amazon-ppc-guide-2026-campaign-strategies/",
-      "content_hash": "7c557b3ce2d20054625f22c7fa5b1a829dd4ae16dcdafc36e4142d26fcdb6f1e",
-      "last_checked": "2026-08-13T08:46:48Z",
-      "last_changed": "2026-08-13T08:46:48Z",
-      "source_type": "blog",
-      "fetch_count": 2,
-      "change_count": 1
-    },
     "https://advertising.amazon.com/solutions/products/sponsored-products": {
       "url": "https://advertising.amazon.com/solutions/products/sponsored-products",
-      "content_hash": "5bd3bbf5dfc809adaee1da3812a5eb03dbe44b702937c6e2d3e56bd63df8a786",
-      "last_checked": "2026-08-13T08:46:49Z",
-      "last_changed": "2026-08-13T08:46:49Z",
       "source_type": "official",
-      "fetch_count": 1,
-      "change_count": 0
-    },
-    "https://advertising.amazon.com/solutions/products/amazon-dsp": {
-      "url": "https://advertising.amazon.com/solutions/products/amazon-dsp",
-      "content_hash": "2eb7ca49c2f6ee0d65169d107aeb3e218550689ccba6434e952f281f5132f9c5",
-      "last_checked": "2026-08-13T08:46:51Z",
-      "last_changed": "2026-08-13T08:46:51Z",
-      "source_type": "official",
-      "fetch_count": 1,
-      "change_count": 0
-    },
-    "https://advertising.amazon.com/library/guides/display-ads-guide": {
-      "url": "https://advertising.amazon.com/library/guides/display-ads-guide",
-      "content_hash": "e2c32d4d8830228d91b1dfb1405800a70bdfa17610206be62c729e59cfc71623",
-      "last_checked": "2026-08-13T08:46:54Z",
-      "last_changed": "2026-08-13T08:46:54Z",
-      "source_type": "official",
-      "fetch_count": 1,
-      "change_count": 0
-    },
-    "https://advertising.amazon.com/en-ca/library/guides/basics-of-amazon-attribution": {
-      "url": "https://advertising.amazon.com/en-ca/library/guides/basics-of-amazon-attribution",
-      "content_hash": "376a1c9487ab7fc09f6de8ae2bd21fd8bd37308dcab8ce1583453f8202b99c77",
-      "last_checked": "2026-08-13T08:46:56Z",
-      "last_changed": "2026-08-13T08:46:56Z",
-      "source_type": "official",
-      "fetch_count": 1,
-      "change_count": 0
-    },
-    "https://advertising.amazon.com/solutions/products/amazon-marketing-cloud": {
-      "url": "https://advertising.amazon.com/solutions/products/amazon-marketing-cloud",
-      "content_hash": "f006ce2007750c563ef8448a745652d6842a15106f7c0cf1de03a4f3284f1f7f",
-      "last_checked": "2026-08-13T08:46:57Z",
-      "last_changed": "2026-08-13T08:46:57Z",
-      "source_type": "official",
-      "fetch_count": 1,
-      "change_count": 0
-    },
-    "https://advertising.amazon.com/help/GTEHPEG5BXY9UX5W": {
-      "url": "https://advertising.amazon.com/help/GTEHPEG5BXY9UX5W",
-      "content_hash": "968aed43fc417625c50031a890500c8bfbd7b647b20064ab35cbf10a4424fd9e",
-      "last_checked": "2026-08-13T08:46:59Z",
-      "last_changed": "2026-08-13T08:46:59Z",
-      "source_type": "official",
-      "fetch_count": 1,
-      "change_count": 0
-    },
-    "https://advertising.amazon.com/solutions/products/stores": {
-      "url": "https://advertising.amazon.com/solutions/products/stores",
-      "content_hash": "ff665450ccbe469fe4647dfc036ce6809877c28edbad8eda15716cd912a95ac0",
-      "last_checked": "2026-08-13T08:47:00Z",
-      "last_changed": "2026-08-13T08:47:00Z",
-      "source_type": "official",
-      "fetch_count": 1,
-      "change_count": 0
+      "fetch_count": 3,
+      "change_count": 2,
+      "content_hash": "edef05888ba3dbce0ffd0b4acb3e18854a34ad4df3f8193b09e73d3477e8d58b",
+      "last_checked": "2026-08-13T20:07:42Z",
+      "last_changed": "2026-08-13T20:07:42Z"
     },
     "https://advertising.amazon.com/library/guides/dynamic-bidding-sponsored-products": {
       "url": "https://advertising.amazon.com/library/guides/dynamic-bidding-sponsored-products",
-      "content_hash": "31a9051c443c28063f9e571262b0909b5bda5f39633c5745e0ec22f49a133d6d",
-      "last_checked": "2026-08-13T08:47:02Z",
-      "last_changed": "2026-08-13T08:47:02Z",
       "source_type": "official",
-      "fetch_count": 1,
-      "change_count": 0
+      "fetch_count": 2,
+      "change_count": 1,
+      "content_hash": "1b947d72958e5a24a8a01ec3ea499a43e6290b93a9396f56af92958c543907a9",
+      "last_checked": "2026-08-13T20:09:44Z",
+      "last_changed": "2026-08-13T20:09:44Z"
     },
     "https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics": {
       "url": "https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics",
-      "content_hash": "b81967d4ad3601190de025d12a2d1c55348db0510a6c0740bdbdb7e09af04fc1",
-      "last_checked": "2026-08-13T08:47:03Z",
-      "last_changed": "2026-08-13T08:47:03Z",
       "source_type": "official",
-      "fetch_count": 1,
-      "change_count": 0
+      "fetch_count": 7,
+      "change_count": 6,
+      "content_hash": "dc89c255b3b3a342c5af37b2161d6f9d39ba86f085b2a7499df0568e989f47fa",
+      "last_checked": "2026-08-13T20:23:59Z",
+      "last_changed": "2026-08-13T20:23:59Z"
+    },
+    "https://advertising.amazon.com/solutions/products/stores": {
+      "url": "https://advertising.amazon.com/solutions/products/stores",
+      "source_type": "official",
+      "fetch_count": 2,
+      "change_count": 1,
+      "content_hash": "ce7732be97ce9e6800c4e160c120dcf580bd177ddb692253047adfd7b6142f1f",
+      "last_checked": "2026-08-13T20:09:33Z",
+      "last_changed": "2026-08-13T20:09:33Z"
+    },
+    "https://advertising.amazon.com/help": {
+      "url": "https://advertising.amazon.com/help",
+      "source_type": "official",
+      "fetch_count": 7,
+      "change_count": 6,
+      "content_hash": "c5adfd9553d8a944496fb5925a94ab491151d40fcc3d2aa682e6044c0da34bee",
+      "last_checked": "2026-08-13T20:31:16Z",
+      "last_changed": "2026-08-13T20:31:16Z"
+    },
+    "https://advertising.amazon.com/solutions/products/amazon-dsp": {
+      "url": "https://advertising.amazon.com/solutions/products/amazon-dsp",
+      "source_type": "official",
+      "fetch_count": 2,
+      "change_count": 1,
+      "content_hash": "d27e620cde2110d91a73e0298ea5f4ad6e09e0be6553199ffb8333fa86fec5ba",
+      "last_checked": "2026-08-13T20:08:33Z",
+      "last_changed": "2026-08-13T20:08:33Z"
+    },
+    "https://advertising.amazon.com/library/guides/display-ads-guide": {
+      "url": "https://advertising.amazon.com/library/guides/display-ads-guide",
+      "source_type": "official",
+      "fetch_count": 2,
+      "change_count": 1,
+      "content_hash": "772b66993c73829c44f7bbc026479bf14e601b65e7f536e4cada84b63efe4236",
+      "last_checked": "2026-08-13T20:08:47Z",
+      "last_changed": "2026-08-13T20:08:47Z"
+    },
+    "https://advertising.amazon.com/en-ca/library/guides/basics-of-amazon-attribution": {
+      "url": "https://advertising.amazon.com/en-ca/library/guides/basics-of-amazon-attribution",
+      "source_type": "official",
+      "fetch_count": 2,
+      "change_count": 1,
+      "content_hash": "600b07db9f5a487461c24432cdddf9581acf6c8db0fdf4a0ef3ea7d94791a873",
+      "last_checked": "2026-08-13T20:08:59Z",
+      "last_changed": "2026-08-13T20:08:59Z"
+    },
+    "https://advertising.amazon.com/solutions/products/amazon-marketing-cloud": {
+      "url": "https://advertising.amazon.com/solutions/products/amazon-marketing-cloud",
+      "source_type": "official",
+      "fetch_count": 2,
+      "change_count": 1,
+      "content_hash": "a2b6db25ed3cb65a15e61191cb5d8df863c09cc70fb10f57ce1b8a57c3db1cc4",
+      "last_checked": "2026-08-13T20:09:11Z",
+      "last_changed": "2026-08-13T20:09:11Z"
+    },
+    "https://advertising.amazon.com/help/GTEHPEG5BXY9UX5W": {
+      "url": "https://advertising.amazon.com/help/GTEHPEG5BXY9UX5W",
+      "source_type": "official",
+      "fetch_count": 6,
+      "change_count": 5,
+      "content_hash": "01f2bc3d3c97d4ccaccb34d3931f675f634d76a3dc9954bea1d954ddf257c3fa",
+      "last_checked": "2026-08-13T20:23:47Z",
+      "last_changed": "2026-08-13T20:23:47Z"
     },
     "https://advertising.amazon.com/library/guides/guide-to-holiday-marketing-with-sponsored-ads": {
       "url": "https://advertising.amazon.com/library/guides/guide-to-holiday-marketing-with-sponsored-ads",
-      "content_hash": "a71b74aa95a81d536adc9475468c61625d27ea53baae921b4bf93820875292f3",
-      "last_checked": "2026-08-13T08:47:04Z",
-      "last_changed": "2026-08-13T08:47:04Z",
       "source_type": "official",
-      "fetch_count": 1,
-      "change_count": 0
+      "fetch_count": 2,
+      "change_count": 1,
+      "content_hash": "b572584d5bb507f78de256f79cbd0f4ac5e36c460894eb8b2b229cb2b93211fa",
+      "last_checked": "2026-08-13T20:10:14Z",
+      "last_changed": "2026-08-13T20:10:14Z"
     }
+  },
+  "metadata": {
+    "last_updated": "2026-08-13T20:31:16Z",
+    "total_sources": 11
   }
 }

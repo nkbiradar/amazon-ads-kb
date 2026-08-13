@@ -152,10 +152,16 @@ class OKFValidator:
             return errors
 
         # Check required fields
-        required_fields = ['title', 'last_updated', 'sources']
+        required_fields = ['title', 'last_updated', 'type', 'sources']
         for field in required_fields:
             if field not in frontmatter_data or not frontmatter_data[field]:
                 errors.append(f"Missing required field: {field}")
+
+        # Validate document-level type field
+        if 'type' in frontmatter_data:
+            type_value = str(frontmatter_data['type']).strip().strip('"\'')
+            if not type_value:
+                errors.append("Document-level type field cannot be empty")
 
         # Validate last_updated format (ISO 8601)
         if 'last_updated' in frontmatter_data:
@@ -305,7 +311,104 @@ class OKFValidator:
 
         return self.failed == 0
 
+def run_regression_tests():
+    """Run regression tests for document-level type field validation"""
+    print("[*] OKF Document-Level Type Regression Tests")
+    print("=" * 60)
+
+    # Test 1: Valid document with type field should PASS
+    print("\nTest 1: Valid document with type:knowledge field")
+    valid_doc = """---
+title: "Test Document"
+last_updated: "2026-08-14T12:00:00Z"
+type: knowledge
+sources:
+  - url: "https://advertising.amazon.com/help"
+    type: official
+    confidence: high
+topic_id: test-document
+---
+
+# Test Document
+
+Test content with citation [¹](https://advertising.amazon.com/help).
+"""
+
+    validator = OKFValidator()
+    frontmatter, body = validator.extract_frontmatter(valid_doc)
+    frontmatter_data = validator.parse_frontmatter(frontmatter)
+    errors = validator.validate_frontmatter(frontmatter_data, "test_valid.md")
+
+    if errors:
+        print(f"[FAIL] Valid document rejected (should PASS): {errors}")
+    else:
+        print(f"[PASS] Valid document accepted correctly")
+
+    # Test 2: Document missing type field should FAIL
+    print("\nTest 2: Document missing type field")
+    invalid_doc = """---
+title: "Test Document"
+last_updated: "2026-08-14T12:00:00Z"
+sources:
+  - url: "https://advertising.amazon.com/help"
+    type: official
+    confidence: high
+topic_id: test-document
+---
+
+# Test Document
+
+Test content with citation [¹](https://advertising.amazon.com/help).
+"""
+
+    validator2 = OKFValidator()
+    frontmatter2, body2 = validator2.extract_frontmatter(invalid_doc)
+    frontmatter_data2 = validator2.parse_frontmatter(frontmatter2)
+    errors2 = validator2.validate_frontmatter(frontmatter_data2, "test_invalid.md")
+
+    if errors2 and any('Missing required field: type' in error for error in errors2):
+        print(f"[PASS] Document missing type rejected correctly")
+    else:
+        print(f"[FAIL] Document missing type should be rejected but wasn't")
+
+    # Test 3: Document with empty type field should FAIL
+    print("\nTest 3: Document with empty type field")
+    empty_type_doc = """---
+title: "Test Document"
+last_updated: "2026-08-14T12:00:00Z"
+type: ""
+sources:
+  - url: "https://advertising.amazon.com/help"
+    type: official
+    confidence: high
+topic_id: test-document
+---
+
+# Test Document
+
+Test content with citation [¹](https://advertising.amazon.com/help).
+"""
+
+    validator3 = OKFValidator()
+    frontmatter3, body3 = validator3.extract_frontmatter(empty_type_doc)
+    frontmatter_data3 = validator3.parse_frontmatter(frontmatter3)
+    errors3 = validator3.validate_frontmatter(frontmatter_data3, "test_empty.md")
+
+    if errors3 and any('cannot be empty' in error for error in errors3):
+        print(f"[PASS] Document with empty type rejected correctly")
+    else:
+        print(f"[FAIL] Document with empty type should be rejected but wasn't")
+
+    print()
+    print("=" * 60)
+    print("Regression tests completed")
+
 def main():
+    # First run regression tests
+    run_regression_tests()
+    print()
+
+    # Then run full validation suite
     validator = OKFValidator()
     success = validator.run_validation()
 
