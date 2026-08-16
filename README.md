@@ -456,7 +456,7 @@ For issues with:
 
 ---
 
-**Status**: Working prototype, not production-ready — see `RUN.md` for what's verified and what isn't, and `DESIGN.md` for known limitations.
+**Status**: Working prototype, not production-ready — see `RUN.md` for what's verified and what isn't, `ARCHITECTURE.md` for component/data-flow design, and `DESIGN.md` for tradeoffs and known limitations.
 **Last Updated**: 2026-08-17
 
 **Quick Verification**: `RUN.md` has a real, complete pipeline run (real network, real `claude` login) with actual output pasted in — including a document created from live-extracted facts, a real bug that run exposed and how it was fixed, and the exact (non-pipeline) reason agent calls currently fall back to the deterministic path. Not just `ls knowledge/`.

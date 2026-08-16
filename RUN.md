@@ -542,6 +542,8 @@ with real output, not a claim.
 
 ---
 
-**For detailed documentation:** See README.md  
-**For project architecture:** See CLAUDE.md  
+**For detailed documentation:** See README.md
+**For system & agent architecture:** See `ARCHITECTURE.md`
+**For design tradeoffs, limitations, and how Claude Code was used:** See `DESIGN.md`
+**For project scope/behavior:** See CLAUDE.md
 **For agent specifications:** See `.claude/agents/*.md`

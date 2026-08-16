@@ -1,62 +1,12 @@
 # Design Document — Amazon Ads Knowledge Acquisition System
 
-This covers both deliverables the brief asks for: system/agent architecture,
-and design tradeoffs. It describes what's actually in this repo as of
-2026-08-16, not an aspirational version of it.
+Tradeoffs and why, known limitations, what would come next, and how Claude
+Code was used. (The high-level design, component/subagent responsibilities,
+data flow, and tech choices are in `ARCHITECTURE.md` — that document is the
+"what," this one's the "why.") Describes what's actually in this repo as of
+2026-08-17, not an aspirational version of it.
 
-## 1. Architecture
-
-```
-sources/seed-urls.json
-        │
-        ▼
-scripts/pipeline.py (PipelineOrchestrator)
-        │
-   ┌────┴─────────────────────────────────────────────┐
-   │  per source, in process_source():                │
-   │                                                    │
-   │  1. Hash check (deterministic — hash_check.py)    │
-   │     skip if unchanged → re-run safety             │
-   │                                                    │
-   │  2. Fetch (deterministic — requests + BeautifulSoup)│
-   │     strip script/style/nav, extract p/h/li/td text │
-   │                                                    │
-   │  3. Extract (fuzzy — claude --agent extractor)     │
-   │     .claude/agents/extractor.md defines the rules  │
-   │     falls back to keyword-line matching on failure │
-   │                                                    │
-   │  4. Validate (fuzzy — claude --agent validator,    │
-   │     ≤5 facts; deterministic word/domain-term        │
-   │     overlap for larger batches)                    │
-   │     .claude/agents/validator.md                    │
-   │                                                    │
-   │  5. Merge — topic assignment is fuzzy (claude       │
-   │     --agent merger decides which document a fact    │
-   │     belongs to), the actual write is deterministic  │
-   │     (_create_document/_update_document in Python)   │
-   │                                                    │
-   └────┬─────────────────────────────────────────────┘
-        ▼
-knowledge/*.md (OKF v0.1) + index.md + log.md
-        ▲
-        │ PreToolUse hook (.claude/settings.json →
-        │ scripts/validate-okf.js) blocks any Write/Edit
-        │ to knowledge/*.md missing required frontmatter
-```
-
-Four subagent definitions live in `.claude/agents/` (`scout`, `extractor`,
-`validator`, `merger`); three skills in `.claude/skills/` define the OKF
-format, dedup rules, and citation rules the agents and the deterministic code
-both follow. `scripts/pipeline.py` invokes agents via `subprocess.run(["claude",
-"--print", "--agent", name, "--agents", <custom-def-json>, "--output-format",
-"json", "--json-schema", <schema>, prompt])` and parses the CLI's
-`structured_output` envelope field. If an agent call fails or the batch is
-too large for a single call, each stage has a documented deterministic
-fallback — the pipeline never crashes because `claude` had a bad day, but it
-also never claims agent-quality output when it used the fallback (every
-fallback path calls `self._log(...)` explicitly).
-
-## 2. The deterministic/fuzzy line, and why it's drawn where it is
+## 1. The deterministic/fuzzy line, and why it's drawn where it is
 
 The brief's framing is the actual design principle here: fetch, hash,
 dedupe-by-URL, and file I/O are deterministic and testable, so they're plain
@@ -87,7 +37,7 @@ is deterministic on purpose, because those are the parts that need to be
 provably correct and re-run-safe, and "provably correct" is much cheaper to
 get from unit tests than from a model call.
 
-## 3. Known limitations (honest notes, per the brief's own ask)
+## 2. Known limitations (honest notes, per the brief's own ask)
 
 - **Scout is the weakest stage.** It doesn't discover new sources — it
   verifies the one seed URL it's given and returns it. Real source discovery
@@ -153,7 +103,7 @@ get from unit tests than from a model call.
   "You Don't Need: production-ready code" — flagging it so it isn't confused
   for an oversight.
 
-## 4. What I'd improve next, if this kept going
+## 3. What I'd improve next, if this kept going
 
 1. Give Scout an actual search/crawl capability so the system can find
    sources on its own, not just verify ones it's handed.
@@ -167,7 +117,7 @@ get from unit tests than from a model call.
    regression like the PyYAML datetime crash in `test_okf_validation.py`
    gets caught before it sits unnoticed.
 
-## 5. How Claude Code was used
+## 4. How Claude Code was used
 
 Four project-specific subagents (`.claude/agents/*.md`) define the prompts
 and JSON schemas for extraction, validation, and merge-topic-assignment;
