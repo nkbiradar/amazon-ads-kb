@@ -514,16 +514,31 @@ run, and the deterministic path produced a real, valid document instead.
 Refreshing that proxy token (out of scope for this repo) would let the real
 extractor/validator/merger agent calls run instead of falling back.
 
+**Re-run safety, verified live, 2026-08-16T21:03:04Z:** ran the exact same
+`--url` command again against a source already processed, with no hash
+cleared this time:
+```
+python scripts/pipeline.py --url "https://advertising.amazon.com/library/guides/basics-of-amazon-attribution" --type official
+```
+Real output: `Sources processed: 0`, `Sources skipped: 1`, `Facts extracted: 0`,
+`Documents created: 0`, `Documents updated: 0`, log line
+`Skipping ... - content unchanged`. `git status --short` immediately after
+showed only `M knowledge/log.md` (the new run's log entry) — no document
+touched, no duplicate written. This is the re-run-safety requirement met
+with real output, not a claim.
+
 **Still open:**
 - A transcript proving the PreToolUse hook fires inside an actual Claude Code
   session (not just the validator script run directly) — e.g. ask Claude Code
   to write a `knowledge/*.md` file missing `type` and confirm it's blocked.
-- Re-run safety on a real second run (`Sources Skipped` > 0, no new files) —
-  straightforward to get: run the exact same `--url` command again without
-  clearing the hash first, and confirm it skips.
-- A run where the extractor/merger agents actually succeed end-to-end
-  (requires a valid proxy token, or running against a direct Anthropic API
-  key instead of the litellm proxy).
+  Attempted 2026-08-16 but blocked on the same proxy auth failure below —
+  Claude Code can't act on the request at all without a working model call,
+  so this needs the token fixed first.
+- A run where the extractor/merger agents actually succeed end-to-end.
+  Attempted twice with the same `litellm.retap.ai` token
+  (`Key Hash: cf036d3fa145e...`) and failed identically both times with a
+  401. Needs either that specific token refreshed to a genuinely different
+  one, or a direct Anthropic API key instead of the litellm proxy.
 
 ---
 
