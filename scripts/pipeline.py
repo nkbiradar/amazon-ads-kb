@@ -1243,11 +1243,13 @@ one document, not near-duplicates. Return topic_assignments only."""
                 if filename in rejected_sources_by_doc:
                     self._add_rejected_sources_to_document(doc_path, rejected_sources_by_doc[filename])
                 documents_updated.append({"filename": filename, "title": title, "facts_added": len(topic_facts)})
-                self.stats["documents_updated"] += 1
+                # NOTE: don't increment self.stats here -- process_source() already
+                # aggregates counts from this function's returned documents_created/
+                # documents_updated lists, so incrementing both here and there was
+                # double-counting every document (e.g. 1 real doc reported as 2).
             else:
                 self._create_document(doc_path, title, topic_facts)
                 documents_created.append({"filename": filename, "title": title, "facts_included": len(topic_facts)})
-                self.stats["documents_created"] += 1
 
         for filename, rejected_sources in rejected_sources_by_doc.items():
             doc_path = KNOWLEDGE_DIR / filename
@@ -1255,7 +1257,6 @@ one document, not near-duplicates. Return topic_assignments only."""
             if doc_path.exists() and not already_touched:
                 self._add_rejected_sources_to_document(doc_path, rejected_sources)
                 documents_updated.append({"filename": filename, "title": doc_path.stem.replace('-', ' ').title(), "facts_added": 0})
-                self.stats["documents_updated"] += 1
 
         self._update_index()
 
@@ -1305,7 +1306,9 @@ one document, not near-duplicates. Return topic_assignments only."""
                     "title": topic,
                     "facts_added": len(topic_facts)
                 })
-                self.stats["documents_updated"] += 1
+                # NOTE: don't increment self.stats here -- see the matching note in
+                # _execute_merger_operations; process_source() aggregates from the
+                # documents_created/documents_updated lists this function returns.
             else:
                 self._create_document(doc_path, topic, topic_facts)
                 documents_created.append({
@@ -1313,7 +1316,6 @@ one document, not near-duplicates. Return topic_assignments only."""
                     "title": topic,
                     "facts_included": len(topic_facts)
                 })
-                self.stats["documents_created"] += 1
 
         # Handle rejected sources
         for doc_filename, rejected_sources in rejected_sources_by_doc.items():
@@ -1325,7 +1327,6 @@ one document, not near-duplicates. Return topic_assignments only."""
                     "title": doc_path.stem.replace('-', ' ').title(),
                     "facts_added": 0
                 })
-                self.stats["documents_updated"] += 1
 
         # Update index
         self._update_index()

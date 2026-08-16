@@ -464,30 +464,61 @@ environment these fixes were made in):
   `Documents created: 0`) — left in place rather than deleted, since the
   point of this file is to log what actually happened, crash included.
 
-**Known open issue — needs another live run to fully resolve:**
-- The extractor and merger agent subprocess calls both returned
-  `returncode=1` after ~3–6 minutes with a near-empty JSON envelope
-  (`is_error: true`, `stop_reason: "stop_sequence"`, `total_cost_usd: 0`, all
-  token counts 0). The pipeline correctly fell back to the deterministic path
-  in both cases rather than crashing, but the actual cause of the agent
-  failure is still unknown — the old logging truncated `result.stdout` to 500
-  characters, which was consumed entirely by envelope metadata before
-  reaching the `"result"` field with the real error text. Fixed the logging
-  (`_invoke_claude_agent` now specifically extracts and logs the `result`
-  field, or falls back to a 3000-char raw slice) so the next run will surface
-  the actual message. Suspect either a `litellm.retap.ai`/non-Anthropic model
-  proxy timing out on the `--agents <custom-json>` + `--json-schema` combo, or
-  a prompt/schema mismatch — needs the real error text to confirm.
-- **Next step:** clear the hash entry for one URL in `sources/sources.json`
-  (see Troubleshooting → "Sources Skipped But Should Be Processed") and
-  re-run `python scripts/pipeline.py --url "https://advertising.amazon.com/solutions/products/sponsored-products" --type official`,
-  then check `knowledge/log.md` and the console output for either a
-  successful real agent call, or the new detailed error text if it fails
-  again — paste whichever happens here.
+**Real end-to-end run, completed successfully, 2026-08-16T20:34:03Z (Nayan's
+machine, real network, real `claude` login):**
+```
+python scripts/pipeline.py --url "https://advertising.amazon.com/library/guides/basics-of-amazon-attribution" --type official
+```
+- Extractor agent call failed (`returncode=1`) — now known why (see below) —
+  fell back to deterministic extraction, found 8 real facts.
+- Validator agent call succeeded for the small batch.
+- Merger agent call failed the same way, fell back to deterministic merging.
+- **Result: `Sources failed: 0`, `Facts extracted: 8`, `Documents created: 2`,
+  no crash.** `knowledge/basics-of-amazon-attribution.md` was created with 8
+  real, cited, provenance-tagged facts and passes
+  `test_okf_validation.py`. Real log entry:
+  `## Pipeline Run: 2026-08-16T20:34:03Z` in `knowledge/log.md`
+  (362.32s, `Documents created: 2`, `Documents updated: 0`).
+- The improved error logging (see below) also caught a **second real bug**
+  while diagnosing this run: `documents_created`/`documents_updated` were
+  being incremented twice — once inside `_execute_merger_operations`/
+  `_fallback_merger`, and again by their caller aggregating the same counts
+  from the returned report. That's why the summary said `Documents created: 2`
+  for the single document actually written. Fixed by removing the inner
+  increments; verified with a standalone repro (`_execute_merger_operations`
+  now leaves `self.stats` untouched, only the caller's aggregation moves it,
+  confirmed 1 real doc → stats reports 1). Re-ran `test_okf_validation.py`
+  (14/14, including the new real document) and
+  `run_error_handling_tests.py` (12/12) after the fix — clean.
+
+**Agent call failure — root cause now known (not a pipeline bug):**
+```
+Error invoking agent: returncode=1
+Agent error result: Failed to authenticate. API Error: 401 Authentication
+Error, Invalid proxy server token passed. Received API Key = sk-...,
+Unable to find token in cache or 'LiteLLM_VerificationTokenTable'
+```
+The `litellm.retap.ai` proxy token used to route the `claude` CLI to a
+non-Anthropic model is invalid/expired in that environment. This surfaced
+only after fixing `_invoke_claude_agent`'s error logging, which previously
+truncated `result.stdout` to 500 characters — entirely consumed by envelope
+metadata (`is_error`, `stop_reason`, `usage`, etc.) before ever reaching the
+`"result"` field with the actual error text. The pipeline's fallback design
+did exactly what it's supposed to do here: neither agent call crashed the
+run, and the deterministic path produced a real, valid document instead.
+Refreshing that proxy token (out of scope for this repo) would let the real
+extractor/validator/merger agent calls run instead of falling back.
+
+**Still open:**
 - A transcript proving the PreToolUse hook fires inside an actual Claude Code
   session (not just the validator script run directly) — e.g. ask Claude Code
   to write a `knowledge/*.md` file missing `type` and confirm it's blocked.
-- Re-run safety on a real second run (`Sources Skipped` > 0, no new files).
+- Re-run safety on a real second run (`Sources Skipped` > 0, no new files) —
+  straightforward to get: run the exact same `--url` command again without
+  clearing the hash first, and confirm it skips.
+- A run where the extractor/merger agents actually succeed end-to-end
+  (requires a valid proxy token, or running against a direct Anthropic API
+  key instead of the litellm proxy).
 
 ---
 

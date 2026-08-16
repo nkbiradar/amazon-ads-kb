@@ -100,24 +100,28 @@ get from unit tests than from a model call.
   phrased very differently, and can false-positive on facts that share
   vocabulary but aren't actually the same claim. The agent path (≤5 facts per
   batch) is the intended primary path for exactly this reason.
-- **The extractor and merger agent subprocess calls have failed
-  (`returncode=1`, near-empty error envelope) on every live run attempted so
-  far**, on a machine with real network access and an authenticated `claude`
-  CLI. Both stages correctly fell back to their deterministic paths rather
-  than crashing, and the fallback path itself produced 8 real extracted facts
-  from a live fetch — but the root cause of the agent failure is still
-  unconfirmed, because the pipeline's own error logging truncated the
-  message before reaching it. Logging was fixed 2026-08-16 to surface the
-  real error text; still needs one more live run to actually see it. See
-  `RUN.md`'s "Known open issue" note.
-- **A real, complete end-to-end run through the fallback path was captured
-  2026-08-16 and crashed** with `Error processing ...: 'last_checked'`
-  despite 8 valid facts having been extracted — `Documents created: 0`. Root
-  cause: `_fallback_validation` dropped the `last_checked` field when
-  reshaping facts, and `_create_document` read it via unsafe `fact[...]`
-  indexing instead of `.get()`. Fixed and reproduced the exact failing
-  sequence in isolation to confirm the fix (see `RUN.md`). Not yet re-run
-  live end-to-end after the fix — that's the next thing to capture.
+- **The extractor and merger agent calls fail on this project's current
+  environment** with `401 Authentication Error, Invalid proxy server token
+  passed` — the `litellm.retap.ai` proxy token used to route `claude` to a
+  non-Anthropic model is invalid/expired. Confirmed via a real live run
+  2026-08-16 once error logging was fixed to surface the actual message
+  (previously truncated before reaching it). This is an environment
+  credential issue, not a code bug — both stages correctly fell back to
+  their deterministic paths instead of crashing. See `RUN.md` for the full
+  error text and what refreshing the token would unlock.
+- **A real, complete end-to-end run was captured 2026-08-16.** First attempt
+  crashed with `Error processing ...: 'last_checked'` despite 8 valid facts
+  extracted (`Documents created: 0`) — `_fallback_validation` dropped the
+  `last_checked` field when reshaping facts, and `_create_document` read it
+  via unsafe `fact[...]` indexing instead of `.get()`. Fixed, reproduced the
+  exact failing sequence in isolation to confirm, then re-ran live: completed
+  cleanly, `knowledge/basics-of-amazon-attribution.md` created with 8 real
+  cited facts, passes `test_okf_validation.py`. That same run also exposed a
+  second real bug — `documents_created`/`documents_updated` counters were
+  incremented twice (once inside the merger functions, once by their
+  caller), so 1 real document was reported as 2. Fixed and verified with a
+  standalone repro. See `RUN.md`'s verification section for the full
+  transcript and both fixes.
 - **13 of the 26 committed knowledge documents were near-duplicates** sharing
   a source URL with another document (sometimes a locale variant of the same
   guide), and were consolidated 2026-08-16 — see `knowledge/index.md` for the
