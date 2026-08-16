@@ -9,7 +9,8 @@
       "url": "https://advertising.amazon.com/help",
       "source_type": "official",
       "description": "Amazon Ads official Help Center and documentation",
-      "enabled": true,
+      "enabled": false,
+      "note": "Disabled 2026-08-16: this is a client-side-rendered app shell (fetched directly and got only a tracking pixel and title:Amazon, no body HTML). fetch_content() uses plain requests, not a browser, so it cannot render this page. Confirmed via direct fetch, not assumed.",
       "verified": "2026-08-10T15:30:00Z"
     },
     {
@@ -65,7 +66,8 @@
       "url": "https://advertising.amazon.com/help/GTEHPEG5BXY9UX5W",
       "source_type": "official",
       "description": "Negative keywords and negative product targeting guide",
-      "enabled": true,
+      "enabled": false,
+      "note": "Disabled 2026-08-16: every /help/* URL on this domain is a client-side-rendered app shell, confirmed by direct fetch (same empty result as the /help entry above). knowledge/negative-keywords-targeting.md's facts about this topic were not produced by fetch_content() against this URL and shouldn't be assumed reproducible by re-running the pipeline against it.",
       "verified": "2026-08-10T18:00:00Z"
     },
     {
@@ -86,7 +88,8 @@
       "url": "https://advertising.amazon.com/API/docs/en-us/guides/reporting/v2/metrics",
       "source_type": "official",
       "description": "Amazon Ads reporting metrics and performance measurement",
-      "enabled": true,
+      "enabled": false,
+      "note": "Disabled 2026-08-16: this returns an empty client-rendered shell (title: 'Amazon Ads Advanced Tools Center', no body content), confirmed by direct fetch. Same class of problem as the /help/* URLs above.",
       "verified": "2026-08-10T18:00:00Z"
     },
     {

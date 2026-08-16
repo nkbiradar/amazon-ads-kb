@@ -723,3 +723,21 @@ described a run that never happened.)
 
 ---
 
+
+## Pipeline Run: 2026-08-16T20:02:08Z
+
+**Duration**: 1.45 seconds
+**Sources Processed**: 0
+**Sources Skipped**: 0
+**Sources Failed**: 1
+
+**Statistics**:
+- Facts extracted: 0
+- Facts new: 0
+- Facts duplicate: 0
+- Facts conflict-resolved: 0
+- Documents created: 0
+- Documents updated: 0
+
+---
+

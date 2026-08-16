@@ -116,6 +116,16 @@ get from unit tests than from a model call.
   tag extraction came up short. That fallback now uses `soup.get_text()`
   instead (still script/style-stripped), so this specific failure mode
   shouldn't recur, but it's worth spot-checking new documents after a run.
+- **`advertising.amazon.com/help/*` and `/API/docs/*` cannot be fetched by
+  this pipeline at all.** Confirmed by fetching them directly: they return a
+  client-side-rendered app shell (a tracking pixel and `title: Amazon`, no
+  body content) because the real page renders via JavaScript after load.
+  `fetch_content()` uses plain `requests`, which never executes JS, so this
+  isn't fixable without a headless-browser fetcher (Playwright, as the brief
+  itself suggested). `/library/guides/*` and `/solutions/products/*` URLs
+  are real server-rendered HTML and work fine — the three broken seeds are
+  disabled in `sources/seed-urls.json` with a note explaining why, rather
+  than left in as silent, guaranteed failures.
 - **This is a prototype, not a production system.** No retry queue for
   MCP/agent-call failures beyond the fetch layer's retries, no concurrency,
   no monitoring. That's an intentional scope choice given the brief's own

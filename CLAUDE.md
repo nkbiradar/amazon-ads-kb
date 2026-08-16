@@ -82,7 +82,7 @@ amazon-ads-kb/
 python scripts/pipeline.py --config sources/seed-urls.json
 
 # Single source
-python scripts/pipeline.py --url "https://advertising.amazon.com/help" --type official
+python scripts/pipeline.py --url "https://advertising.amazon.com/solutions/products/sponsored-products" --type official
 ```
 
 There is no `claude --prompt` flag — `claude`'s non-interactive flag is

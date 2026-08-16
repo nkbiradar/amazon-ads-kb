@@ -45,6 +45,18 @@ is no MCP server (Playwright, web-reader, or otherwise) in the fetch path.
 If you want to swap in an MCP-based fetcher later, `fetch_content()` is the
 single place to change.
 
+**A consequence of that:** `advertising.amazon.com/help/*` and
+`advertising.amazon.com/API/docs/*` are client-side-rendered app shells —
+fetched directly and confirmed they return only a tracking pixel and
+`title: Amazon`, no body HTML at all, because the real content only exists
+after JavaScript runs. `requests` can't run JavaScript, so `fetch_content()`
+correctly returns nothing for these rather than guessing. `library/guides/*`
+and `solutions/products/*` pages, by contrast, are real server-rendered HTML
+and work fine. The three `/help` and `/API/docs` seeds in
+`sources/seed-urls.json` are disabled for this reason (see the `note` field
+on each). If you want those specific pages, you need a browser-based fetcher
+(Playwright) — that's a real gap, not a config typo.
+
 ## 🚀 Setup Steps
 
 ### Step 1: Clone the Repository
@@ -112,7 +124,7 @@ Edit `sources/seed-urls.json` with your desired Amazon Ads sources:
 python scripts/pipeline.py --config sources/seed-urls.json
 
 # Or run with a single source
-python scripts/pipeline.py --url "https://advertising.amazon.com/help" --type official
+python scripts/pipeline.py --url "https://advertising.amazon.com/solutions/products/sponsored-products" --type official
 ```
 
 **What happens during first run:**
@@ -307,7 +319,7 @@ python scripts/pipeline.py --config sources/seed-urls.json 2>&1 | tee pipeline.l
 cat sources/seed-urls.json
 
 # Test with single source first
-python scripts/pipeline.py --url "https://advertising.amazon.com/help" --type official
+python scripts/pipeline.py --url "https://advertising.amazon.com/solutions/products/sponsored-products" --type official
 ```
 
 ### OKF Validation Errors

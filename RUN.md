@@ -425,16 +425,34 @@ environment these fixes were made in):
 - `python scripts/pipeline.py --url "https://advertising.amazon.com/help" --type official`
   — ran in a sandbox with no outbound access to advertising.amazon.com and no
   logged-in `claude`. It retried 3x with backoff, failed cleanly, and wrote a
-  real (not fabricated) entry to `knowledge/log.md`. This proves the error
-  path; it does NOT prove the extractor/validator/merger agent calls work
-  end-to-end, because they never got the chance to run.
+  real (not fabricated) entry to `knowledge/log.md`. This proved the error
+  path but not the agent calls, because they never got the chance to run.
+- **Same command, run for real by Nayan on 2026-08-16** (real network, real
+  `claude` login): also produced `Sources failed: 1, Facts extracted: 0,
+  Documents created: 0` — but for a different, now-understood reason.
+  Fetched `https://advertising.amazon.com/help` directly (outside the
+  pipeline) and confirmed it returns a client-side-rendered app shell: a
+  tracking pixel and `title: Amazon`, no body HTML at all. `fetch_content()`
+  uses plain `requests`, which can't run the JavaScript that renders that
+  page's real content — so it correctly reported `empty_content` and skipped
+  rather than fabricating a document. Also directly fetched
+  `/help/GTEHPEG5BXY9UX5W` and `/API/docs/en-us/guides/reporting/v2/metrics`
+  and got the same empty shell — this is a property of those specific URL
+  patterns on this domain, not a one-off. `/library/guides/*` and
+  `/solutions/products/*` URLs, fetched the same way, returned full
+  server-rendered article HTML. All three broken URLs are now disabled in
+  `sources/seed-urls.json` with a `note` field explaining why, and the
+  README/RUN.md/CLAUDE.md examples were switched to
+  `/solutions/products/sponsored-products`, which is confirmed real content.
 
-**Not verified — needs to be run by whoever has `claude` logged in and
+**Still not verified — needs to be run by whoever has `claude` logged in and
 network access, and the real output pasted here:**
-- A full pipeline run against a live source, showing the extractor/validator/
-  merger agents actually being invoked (`claude --print --agent ... --agents
-  ... --output-format json --json-schema ...` in the log) and a document
-  being created or updated from real agent output — not the deterministic
+- `python scripts/pipeline.py --url "https://advertising.amazon.com/solutions/products/sponsored-products" --type official`
+  (or `--config sources/seed-urls.json` for the full run) against a URL
+  confirmed to have real content, showing the extractor/validator/merger
+  agents actually being invoked (`claude --print --agent ... --agents ...
+  --output-format json --json-schema ...` in the log) and a document being
+  created or updated from real agent output — not the deterministic
   fallback. If you only see fallback log lines, check `claude -p "say ok"
   --output-format json` first (see README Troubleshooting).
 - A transcript proving the PreToolUse hook fires inside an actual Claude Code
