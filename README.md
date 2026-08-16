@@ -179,6 +179,7 @@ amazon-ads-kb/
 ├── scripts/                 # Automation scripts
 │   ├── pipeline.py         # Main pipeline orchestration
 │   ├── hash_check.py       # Content hash checking
+│   ├── reset_source.py     # Clear one URL's hash entry to force re-processing
 │   └── validate-okf.js     # OKF format validation
 └── README.md               # This file
 ```
@@ -206,12 +207,16 @@ head -15 knowledge/amazon-ads-help-center.md
 # ---
 # title: "Document Title"
 # last_updated: 2026-08-10T12:00:00Z
+# type: knowledge
 # sources:
 #   - url: "https://..."
 #     type: official
 #     confidence: high
 # topic_id: document-slug
 # ---
+#
+# `type` is OKF v0.1's one hard rule (must be present and non-empty) --
+# scripts/validate-okf.js blocks any Write/Edit to knowledge/*.md missing it.
 ```
 
 ### 3. Check Knowledge Index
@@ -292,6 +297,30 @@ The fallback exists so a broken `claude` install doesn't stop the pipeline —
 but if you only ever see fallback-quality facts, this is why. It is NOT
 silent: every fallback is logged.
 
+**Real example hit during development:** on a `litellm.retap.ai`-proxied
+setup, agent calls failed with `returncode=1` and the log showed
+`Failed to authenticate. API Error: 401 Authentication Error, Invalid proxy
+server token passed`. That's an expired/invalid proxy token, not a pipeline
+bug — the fallback path handled it correctly and still produced a real,
+valid document. If you see this, refresh the token in whatever's issuing it
+(not something this repo controls). See `RUN.md` for the full transcript.
+
+### Re-testing the Same URL (Sources Skipped)
+
+**Problem**: You want to re-run against a URL you already processed, but the
+pipeline says `Skipping <url> - content unchanged` because its content hash
+is already stored.
+
+**Solution**: Clear that one URL's hash entry, then re-run — no shell
+quoting required, works the same in bash/PowerShell/cmd:
+```bash
+python scripts/reset_source.py "https://advertising.amazon.com/solutions/products/sponsored-products"
+python scripts/pipeline.py --url "https://advertising.amazon.com/solutions/products/sponsored-products" --type official
+
+# With no URL argument, it just lists tracked source URLs (no writes):
+python scripts/reset_source.py
+```
+
 ### Hash Check Script Fails
 
 **Problem**: `python scripts/hash_check.py` returns errors
@@ -331,6 +360,7 @@ python scripts/pipeline.py --url "https://advertising.amazon.com/solutions/produ
 ---
 title: "Document Title"
 last_updated: 2026-08-10T12:00:00Z
+type: knowledge
 sources:
   - url: "https://..."
     type: official
@@ -426,7 +456,7 @@ For issues with:
 
 ---
 
-**Status**: Working prototype, not production-ready — see `RUN.md` for what's verified and what isn't, and the design document for known limitations.
-**Last Updated**: 2026-08-16
+**Status**: Working prototype, not production-ready — see `RUN.md` for what's verified and what isn't, and `DESIGN.md` for known limitations.
+**Last Updated**: 2026-08-17
 
-**Quick Verification**: See `RUN.md` for a real command + real output, not just `ls knowledge/`.
+**Quick Verification**: `RUN.md` has a real, complete pipeline run (real network, real `claude` login) with actual output pasted in — including a document created from live-extracted facts, a real bug that run exposed and how it was fixed, and the exact (non-pipeline) reason agent calls currently fall back to the deterministic path. Not just `ls knowledge/`.
