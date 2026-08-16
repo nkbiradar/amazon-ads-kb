@@ -282,18 +282,13 @@ python scripts/pipeline.py --config sources/seed-urls.json 2>&1 | grep -i error
 ### Sources Skipped But Should Be Processed
 **Check:**
 ```bash
-# Clear hashes to force re-processing
-python -c "
-import json
-from pathlib import Path
-sources = Path('sources/sources.json')
-if sources.exists():
-    data = json.load(open(sources))
-    for url in data.get('sources', {}):
-        data['sources'][url].pop('content_hash', None)
-        data['sources'][url].pop('last_checked', None)
-    json.dump(data, open(sources, 'w'), indent=2)
-"
+# Clear the hash entry for one URL so it's re-processed instead of skipped.
+# Plain script on purpose -- no shell here-doc/quoting, so it works the same
+# in PowerShell, cmd, and bash.
+python scripts/reset_source.py "https://advertising.amazon.com/solutions/products/sponsored-products"
+
+# With no URL argument it just lists tracked source URLs, no writes.
+python scripts/reset_source.py
 ```
 
 ### Validation Fails
