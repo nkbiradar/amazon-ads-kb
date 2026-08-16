@@ -471,8 +471,13 @@ python scripts/pipeline.py --url "https://advertising.amazon.com/library/guides/
 ```
 - Extractor agent call failed (`returncode=1`) — now known why (see below) —
   fell back to deterministic extraction, found 8 real facts.
-- Validator agent call succeeded for the small batch.
-- Merger agent call failed the same way, fell back to deterministic merging.
+- Validator never attempted an agent call this run: `invoke_validator_agent`
+  only calls the agent for batches of 5 facts or fewer (line ~872); 8 facts
+  went straight to `_fallback_validation` by design. Worth noting as a real
+  limitation, not glossing over it: on this run's fact count, the validator
+  agent path was never exercised at all.
+- Merger agent call failed (`returncode=1`, same auth error), fell back to
+  deterministic merging.
 - **Result: `Sources failed: 0`, `Facts extracted: 8`, `Documents created: 2`,
   no crash.** `knowledge/basics-of-amazon-attribution.md` was created with 8
   real, cited, provenance-tagged facts and passes
