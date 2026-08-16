@@ -12,6 +12,7 @@ Every OKF document MUST begin with YAML frontmatter containing these fields:
 ---
 title: "Document Title"
 last_updated: 2026-06-18T12:00:00Z
+type: knowledge
 sources:
   - url: "https://..."
     type: official|community|blog
@@ -33,6 +34,14 @@ topic_id: unique-topic-slug
 - Required: Yes
 - Format: `YYYY-MM-DDTHH:mm:ssZ`
 - Updates on every change to the document
+
+**type**: Document-level type
+- Type: String
+- Required: Yes — **this is OKF v0.1's one hard rule.** `scripts/validate-okf.js`
+  (the PreToolUse hook) rejects any write to `knowledge/*.md` that's missing
+  this field, full stop, regardless of how good the rest of the document is.
+- Value: The pipeline always writes `knowledge`; the validator accepts any
+  non-empty string, but use `knowledge` unless you have a specific reason not to.
 
 **sources**: Array of source objects
 - Type: Array of objects
@@ -103,6 +112,7 @@ Daily budgets for Sponsored Products must be at least $1.00. [²](https://advert
 ---
 title: "Sponsored Products Campaign Management"
 last_updated: 2026-06-18T15:30:00Z
+type: knowledge
 sources:
   - url: "https://advertising.amazon.com/API/docs/v2/guides/sponsored-products"
     type: official
@@ -184,7 +194,7 @@ Known constraints for Sponsored Products:
 
 When creating or updating OKF documents:
 
-- [ ] All required frontmatter fields present
+- [ ] All required frontmatter fields present, including `type` (non-empty — the hook blocks the write otherwise)
 - [ ] `last_updated` is current ISO timestamp
 - [ ] `sources` array has no duplicate URLs
 - [ ] `topic_id` is unique and kebab-case

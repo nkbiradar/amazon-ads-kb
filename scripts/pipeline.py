@@ -805,13 +805,22 @@ Extract discrete factual claims about Amazon Ads from this content. Return struc
         # Create prompt with facts and existing knowledge context
         facts_json = json.dumps(facts[:5], indent=2)  # Limit to first 5 facts for agent context
 
+        # The agent can't validate against knowledge it can't see: give it each
+        # document's title/topic_id plus its existing fact bullets (provenance
+        # comments and markdown stripped, so it's just claims) rather than a
+        # bare document count.
+        existing_summary = self._summarize_existing_knowledge(existing_docs)
+
         task_prompt = f"""FACTS TO VALIDATE:
 {facts_json}
 
-EXISTING KNOWLEDGE:
-{len(existing_docs)} existing documents in knowledge/ directory.
+EXISTING KNOWLEDGE ({len(existing_docs)} documents):
+{existing_summary}
 
-Validate these facts against existing knowledge and return validation report."""
+Validate the facts above against the existing knowledge above. For each fact,
+set related_document to the exact filename if it matches an existing
+document's topic, and reference the specific existing claim your reasoning is
+based on. Return a validation report."""
 
         # JSON schema for structured output
         json_schema = {
@@ -877,6 +886,41 @@ Validate these facts against existing knowledge and return validation report."""
             "validation_timestamp": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
             "facts_validated": validated_facts
         }
+
+    def _summarize_existing_knowledge(self, existing_docs: Dict[str, Dict], max_chars: int = 6000) -> str:
+        """
+        Build a compact, plain-text summary of existing knowledge for the
+        validator agent's prompt: title/topic_id per document plus its
+        existing fact bullets, with provenance HTML comments and citation
+        markup stripped so it reads as claims, not markup.
+        """
+        if not existing_docs:
+            return "(none yet — this is the first content in the knowledge base)"
+
+        parts = []
+        for filename, doc in existing_docs.items():
+            frontmatter = doc.get('frontmatter', {})
+            title = frontmatter.get('title', filename)
+            topic_id = frontmatter.get('topic_id', filename.replace('.md', ''))
+
+            body = doc.get('body', '')
+            # Strip provenance comments and citation markup, keep bullet claims
+            body = re.sub(r'<!--.*?-->', '', body)
+            body = re.sub(r'\[[⁰¹²³⁴⁵⁶⁷⁸⁹]+\]\([^)]+\)', '', body)
+            claims = [
+                line.strip().lstrip('-').strip()
+                for line in body.split('\n')
+                if line.strip().startswith('-') and len(line.strip()) > 3
+            ]
+
+            doc_summary = f"### {filename} (topic_id: {topic_id}, title: \"{title}\")\n"
+            doc_summary += '\n'.join(f"- {c}" for c in claims[:15]) if claims else "(no bulleted claims)"
+            parts.append(doc_summary)
+
+        summary = '\n\n'.join(parts)
+        if len(summary) > max_chars:
+            summary = summary[:max_chars] + f"\n... (truncated, {len(existing_docs)} documents total)"
+        return summary
 
     def _load_existing_knowledge(self) -> Dict[str, Dict]:
         """Load existing knowledge documents for validation."""
