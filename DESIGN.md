@@ -122,17 +122,21 @@ get from unit tests than from a model call.
   caller), so 1 real document was reported as 2. Fixed and verified with a
   standalone repro. See `RUN.md`'s verification section for the full
   transcript and both fixes.
-- **13 of the 26 committed knowledge documents were near-duplicates** sharing
-  a source URL with another document (sometimes a locale variant of the same
-  guide), and were consolidated 2026-08-16 — see `knowledge/index.md` for the
-  removed filenames and what happened to their content. Two were placeholder
-  documents that described their own prior corruption rather than containing
-  Amazon Ads facts, and one was raw GitHub page chrome captured as a fact.
-  These existed because the original fetch fallback (`fetch_content`) dropped
-  to `response.text[:5000]` — raw, unstripped HTML/JS — whenever structured
-  tag extraction came up short. That fallback now uses `soup.get_text()`
-  instead (still script/style-stripped), so this specific failure mode
-  shouldn't recur, but it's worth spot-checking new documents after a run.
+- **13 of the original 26 committed knowledge documents were near-duplicates**
+  sharing a source URL with another document (sometimes a locale variant of
+  the same guide), and were consolidated 2026-08-16, bringing the count to
+  13 — see `knowledge/index.md` for the removed filenames and what happened
+  to their content. Two were placeholder documents that described their own
+  prior corruption rather than containing Amazon Ads facts, and one was raw
+  GitHub page chrome captured as a fact. These existed because the original
+  fetch fallback (`fetch_content`) dropped to `response.text[:5000]` — raw,
+  unstripped HTML/JS — whenever structured tag extraction came up short.
+  That fallback now uses `soup.get_text()` instead (still script/style-
+  stripped), so this specific failure mode shouldn't recur, but it's worth
+  spot-checking new documents after a run. A 14th document
+  (`basics-of-amazon-attribution.md`) was added back later the same day by
+  a real, live pipeline run against that URL (see `RUN.md`), so the current
+  count is 14, still under the 15-document cap.
 - **`advertising.amazon.com/help/*` and `/API/docs/*` cannot be fetched by
   this pipeline at all.** Confirmed by fetching them directly: they return a
   client-side-rendered app shell (a tracking pixel and `title: Amazon`, no
