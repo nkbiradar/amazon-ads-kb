@@ -445,16 +445,50 @@ environment these fixes were made in):
   README/RUN.md/CLAUDE.md examples were switched to
   `/solutions/products/sponsored-products`, which is confirmed real content.
 
-**Still not verified — needs to be run by whoever has `claude` logged in and
-network access, and the real output pasted here:**
-- `python scripts/pipeline.py --url "https://advertising.amazon.com/solutions/products/sponsored-products" --type official`
-  (or `--config sources/seed-urls.json` for the full run) against a URL
-  confirmed to have real content, showing the extractor/validator/merger
-  agents actually being invoked (`claude --print --agent ... --agents ...
-  --output-format json --json-schema ...` in the log) and a document being
-  created or updated from real agent output — not the deterministic
-  fallback. If you only see fallback log lines, check `claude -p "say ok"
-  --output-format json` first (see README Troubleshooting).
+**Verified live, 2026-08-16 (Nayan's machine, real network + real `claude` login):**
+- `python scripts/pipeline.py --url "https://advertising.amazon.com/library/guides/basics-of-amazon-attribution" --type official`
+  fetched real content, correctly fell back to deterministic extraction after
+  the extractor agent call failed (`returncode=1` after ~6 min — see "Known
+  open issue" below), extracted 8 real facts, fell back to deterministic
+  validation after the merger agent call failed the same way, then crashed
+  with `Error processing ...: 'last_checked'` and wrote `Documents created: 0`
+  despite having 8 valid facts in hand. Root-caused to a real bug (not agent
+  flakiness): `_fallback_validation` copied `fact`/`source_url`/`source_type`/
+  `confidence` into its result but silently dropped `last_checked`, and
+  `_create_document` then read `fact['last_checked']` via unsafe bracket
+  indexing instead of `.get()` (the sibling function `_update_document`
+  already used `.get()` — this one didn't). Fixed both spots, plus stamped
+  `last_checked` on agent-produced facts too (the extractor agent's
+  `json_schema` never requested that field, so even a successful agent call
+  would have hit the same crash). Reproduced the exact failing sequence
+  (fallback extraction → fallback validation → `_create_document`) in
+  isolation afterward and confirmed it now completes and writes a valid OKF
+  document with `last_checked` present in the provenance comment.
+- Real log entries from that run are in `knowledge/log.md`
+  (`## Pipeline Run: 2026-08-16T20:16:18Z`, 374.51s, `Facts extracted: 8`,
+  `Documents created: 0`) — left in place rather than deleted, since the
+  point of this file is to log what actually happened, crash included.
+
+**Known open issue — needs another live run to fully resolve:**
+- The extractor and merger agent subprocess calls both returned
+  `returncode=1` after ~3–6 minutes with a near-empty JSON envelope
+  (`is_error: true`, `stop_reason: "stop_sequence"`, `total_cost_usd: 0`, all
+  token counts 0). The pipeline correctly fell back to the deterministic path
+  in both cases rather than crashing, but the actual cause of the agent
+  failure is still unknown — the old logging truncated `result.stdout` to 500
+  characters, which was consumed entirely by envelope metadata before
+  reaching the `"result"` field with the real error text. Fixed the logging
+  (`_invoke_claude_agent` now specifically extracts and logs the `result`
+  field, or falls back to a 3000-char raw slice) so the next run will surface
+  the actual message. Suspect either a `litellm.retap.ai`/non-Anthropic model
+  proxy timing out on the `--agents <custom-json>` + `--json-schema` combo, or
+  a prompt/schema mismatch — needs the real error text to confirm.
+- **Next step:** clear the hash entry for one URL in `sources/sources.json`
+  (see Troubleshooting → "Sources Skipped But Should Be Processed") and
+  re-run `python scripts/pipeline.py --url "https://advertising.amazon.com/solutions/products/sponsored-products" --type official`,
+  then check `knowledge/log.md` and the console output for either a
+  successful real agent call, or the new detailed error text if it fails
+  again — paste whichever happens here.
 - A transcript proving the PreToolUse hook fires inside an actual Claude Code
   session (not just the validator script run directly) — e.g. ask Claude Code
   to write a `knowledge/*.md` file missing `type` and confirm it's blocked.

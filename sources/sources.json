@@ -102,15 +102,15 @@
     "https://advertising.amazon.com/library/guides/basics-of-amazon-attribution": {
       "url": "https://advertising.amazon.com/library/guides/basics-of-amazon-attribution",
       "content_hash": "600b07db9f5a487461c24432cdddf9581acf6c8db0fdf4a0ef3ea7d94791a873",
-      "last_checked": "2026-08-16T20:05:37Z",
-      "last_changed": "2026-08-16T20:05:37Z",
+      "last_checked": "2026-08-16T20:16:19Z",
+      "last_changed": "2026-08-16T20:16:19Z",
       "source_type": "official",
       "fetch_count": 1,
       "change_count": 0
     }
   },
   "metadata": {
-    "last_updated": "2026-08-16T20:05:37Z",
+    "last_updated": "2026-08-16T20:16:19Z",
     "total_sources": 12
   }
 }

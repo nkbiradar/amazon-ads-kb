@@ -741,3 +741,57 @@ described a run that never happened.)
 
 ---
 
+
+## Pipeline Run: 2026-08-16T20:08:35Z
+
+**Duration**: 1.68 seconds
+**Sources Processed**: 0
+**Sources Skipped**: 1
+**Sources Failed**: 0
+
+**Statistics**:
+- Facts extracted: 0
+- Facts new: 0
+- Facts duplicate: 0
+- Facts conflict-resolved: 0
+- Documents created: 0
+- Documents updated: 0
+
+---
+
+
+## Pipeline Run: 2026-08-16T20:12:02Z
+
+**Duration**: 1.62 seconds
+**Sources Processed**: 0
+**Sources Skipped**: 1
+**Sources Failed**: 0
+
+**Statistics**:
+- Facts extracted: 0
+- Facts new: 0
+- Facts duplicate: 0
+- Facts conflict-resolved: 0
+- Documents created: 0
+- Documents updated: 0
+
+---
+
+
+## Pipeline Run: 2026-08-16T20:16:18Z
+
+**Duration**: 374.51 seconds
+**Sources Processed**: 0
+**Sources Skipped**: 0
+**Sources Failed**: 1
+
+**Statistics**:
+- Facts extracted: 8
+- Facts new: 7
+- Facts duplicate: 0
+- Facts conflict-resolved: 1
+- Documents created: 0
+- Documents updated: 0
+
+---
+

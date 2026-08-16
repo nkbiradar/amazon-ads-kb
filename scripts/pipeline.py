@@ -190,21 +190,36 @@ class PipelineOrchestrator:
             self._log(f"Invoking {agent_name} agent via Claude CLI...")
             self._log(f"Command: claude --print --agent {agent_name} {'--agents <custom-agent>' if agent_def else ''}")
 
-            # Execute the command
+            # Execute the command. stdin is explicitly closed (not inherited from
+            # the parent terminal) so the CLI never blocks waiting on piped/typed
+            # input it's not going to get when run headlessly from a script.
             result = subprocess.run(
                 cmd,
                 capture_output=True,
                 text=True,
                 timeout=300,  # 5 minute timeout
-                cwd=Path.cwd()
+                cwd=Path.cwd(),
+                stdin=subprocess.DEVNULL
             )
 
             if result.returncode != 0:
                 self._log(f"Error invoking agent: returncode={result.returncode}")
                 if result.stderr:
-                    self._log(f"STDERR: {result.stderr[:500]}")
+                    self._log(f"STDERR: {result.stderr[:2000]}")
                 if result.stdout:
-                    self._log(f"STDOUT (partial): {result.stdout[:500]}")
+                    # The CLI's JSON envelope puts the actual error message in the
+                    # "result" field, which previously got cut off by a 500-char
+                    # truncation before we ever reached it (envelope metadata like
+                    # is_error/stop_reason/usage sorts first). Try to pull "result"
+                    # out specifically; fall back to a much larger raw slice.
+                    stdout_text = result.stdout.strip()
+                    try:
+                        err_envelope = json.loads(stdout_text)
+                        err_result = err_envelope.get("result")
+                        self._log(f"Agent error result: {str(err_result)[:2000]}")
+                        self._log(f"Full error envelope keys: {list(err_envelope.keys())}")
+                    except json.JSONDecodeError:
+                        self._log(f"STDOUT (partial, non-JSON): {stdout_text[:3000]}")
                 return None
 
             output = result.stdout.strip()
@@ -550,6 +565,13 @@ Extract discrete factual claims about Amazon Ads from this content. Return struc
 
         if result and "facts" in result:
             self._log(f"Extractor agent extracted {len(result['facts'])} fact(s)")
+            # The extractor agent's json_schema doesn't request last_checked (it's a
+            # provenance timestamp, not something the model should invent), so stamp
+            # it here deterministically -- otherwise agent-produced facts would hit
+            # the same missing-field path the fallback used to before it was fixed.
+            now = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+            for fact in result["facts"]:
+                fact.setdefault("last_checked", now)
             return result["facts"]
         else:
             # Fallback to simple extraction if agent fails
@@ -879,6 +901,12 @@ based on. Return a validation report."""
             validation_result['source_url'] = source_url
             validation_result['source_type'] = source_type
             validation_result['confidence'] = confidence
+            # Preserve last_checked from the original fact instead of dropping it --
+            # this was silently discarded here, which is what caused _create_document
+            # to KeyError on 'last_checked' further down the pipeline.
+            validation_result['last_checked'] = fact_obj.get(
+                'last_checked', datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+            )
 
             validated_facts.append(validation_result)
 
@@ -1398,8 +1426,12 @@ sources:
             # Convert citation number to superscript
             citation_num = self._to_superscript(i)
             fact_text = fact['fact']
+            # last_checked isn't in the extractor agent's json_schema (agent-produced
+            # facts won't have it) and older fallback-validation output dropped it too
+            # -- default to now rather than KeyError, same as _update_document does.
+            last_checked = fact.get('last_checked', timestamp)
             body += f"- {fact_text} [{citation_num}]({fact['source_url']})\n"
-            body += f"<!-- provenance: source_url=\"{fact['source_url']}\" source_type=\"{fact['source_type']}\" confidence=\"{fact['confidence']}\" last_checked=\"{fact['last_checked']}\" -->\n"
+            body += f"<!-- provenance: source_url=\"{fact['source_url']}\" source_type=\"{fact['source_type']}\" confidence=\"{fact['confidence']}\" last_checked=\"{last_checked}\" -->\n"
 
         # Combine
         content = frontmatter + body

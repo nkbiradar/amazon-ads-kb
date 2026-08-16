@@ -100,11 +100,24 @@ get from unit tests than from a model call.
   phrased very differently, and can false-positive on facts that share
   vocabulary but aren't actually the same claim. The agent path (≤5 facts per
   batch) is the intended primary path for exactly this reason.
-- **No end-to-end run with a live, authenticated `claude` and open network
-  access has been captured in this repo yet.** The fixes made 2026-08-16 were
-  verified in a sandbox with neither (see `RUN.md`'s verification section for
-  exactly what was and wasn't confirmed). Whoever runs this next should
-  capture that transcript in `RUN.md`.
+- **The extractor and merger agent subprocess calls have failed
+  (`returncode=1`, near-empty error envelope) on every live run attempted so
+  far**, on a machine with real network access and an authenticated `claude`
+  CLI. Both stages correctly fell back to their deterministic paths rather
+  than crashing, and the fallback path itself produced 8 real extracted facts
+  from a live fetch — but the root cause of the agent failure is still
+  unconfirmed, because the pipeline's own error logging truncated the
+  message before reaching it. Logging was fixed 2026-08-16 to surface the
+  real error text; still needs one more live run to actually see it. See
+  `RUN.md`'s "Known open issue" note.
+- **A real, complete end-to-end run through the fallback path was captured
+  2026-08-16 and crashed** with `Error processing ...: 'last_checked'`
+  despite 8 valid facts having been extracted — `Documents created: 0`. Root
+  cause: `_fallback_validation` dropped the `last_checked` field when
+  reshaping facts, and `_create_document` read it via unsafe `fact[...]`
+  indexing instead of `.get()`. Fixed and reproduced the exact failing
+  sequence in isolation to confirm the fix (see `RUN.md`). Not yet re-run
+  live end-to-end after the fix — that's the next thing to capture.
 - **13 of the 26 committed knowledge documents were near-duplicates** sharing
   a source URL with another document (sometimes a locale variant of the same
   guide), and were consolidated 2026-08-16 — see `knowledge/index.md` for the
