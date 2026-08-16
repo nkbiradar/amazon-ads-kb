@@ -21,6 +21,20 @@ Negative keywords and negative product targeting help reduce advertising costs a
 Negative keywords are search terms you can exclude from your campaigns to prevent your ads from showing for irrelevant or poorly performing queries. [¹](https://advertising.amazon.com/help/GTEHPEG5BXY9UX5W)
 <!-- provenance: source_url="https://advertising.amazon.com/help/GTEHPEG5BXY9UX5W" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
+## Match Type Limits
+
+- Negative keywords support phrase and exact match types [¹](https://advertising.amazon.com/help/GTEHPEG5BXY9UX5W)
+<!-- provenance: source_url="https://advertising.amazon.com/help/GTEHPEG5BXY9UX5W" source_type="official" confidence="high" last_checked="2026-08-13T20:13:15Z" -->
+- Negative phrase match has a maximum of 4 words per keyword and an 80 character limit [¹](https://advertising.amazon.com/help/GTEHPEG5BXY9UX5W)
+<!-- provenance: source_url="https://advertising.amazon.com/help/GTEHPEG5BXY9UX5W" source_type="official" confidence="high" last_checked="2026-08-13T20:13:15Z" -->
+- Negative exact match has a maximum of 10 words per keyword and an 80 character limit [¹](https://advertising.amazon.com/help/GTEHPEG5BXY9UX5W)
+<!-- provenance: source_url="https://advertising.amazon.com/help/GTEHPEG5BXY9UX5W" source_type="official" confidence="high" last_checked="2026-08-13T20:13:15Z" -->
+- A negative keyword's match type cannot be changed after creation [¹](https://advertising.amazon.com/help/GTEHPEG5BXY9UX5W)
+<!-- provenance: source_url="https://advertising.amazon.com/help/GTEHPEG5BXY9UX5W" source_type="official" confidence="high" last_checked="2026-08-13T20:13:15Z" -->
+- Negative keywords require a 72-hour buffer period to take effect [¹](https://advertising.amazon.com/help/GTEHPEG5BXY9UX5W)
+<!-- provenance: source_url="https://advertising.amazon.com/help/GTEHPEG5BXY9UX5W" source_type="official" confidence="high" last_checked="2026-08-13T20:13:15Z" -->
+<!-- merged from gtehpeg5bxy9ux5w.md, same source URL, during doc consolidation 2026-08-16 -->
+
 ## Benefits of Negative Keywords
 
 ### Cost Reduction

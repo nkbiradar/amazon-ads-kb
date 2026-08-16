@@ -9,17 +9,5 @@
     "CLAUDE_CODE_DISABLE_UNKNOWN_MODEL_WINDOW_ENFORCEMENT": "1",
     "API_TIMEOUT_MS": "3000000",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
-  },
-  "model": "glm-4.7",
-  "hooks": {
-    "PreToolUse": {
-      "knowledge_okf_validator": {
-        "description": "Validate OKF frontmatter before writing to knowledge/ directory",
-        "tools": ["Write", "Edit"],
-        "pattern": "knowledge\\/.*\\.md$",
-        "script": "node scripts/validate-okf.js",
-        "errorMessage": "OKF frontmatter validation failed. Ensure file has valid YAML frontmatter with: title (string), last_updated (ISO 8601 timestamp), and sources array with url/type/confidence for each source."
-      }
-    }
   }
 }

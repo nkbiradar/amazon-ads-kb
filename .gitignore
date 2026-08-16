@@ -1,2 +1,10 @@
-# Claude Code settings - exclude from version control
-.claude/settings.json
+# Claude Code local, machine-specific permission cache - not portable, safe to exclude
+.claude/settings.local.json
+
+# Python
+__pycache__/
+*.pyc
+
+# Debug/scratch
+hook-debug.log
+*.log

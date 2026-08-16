@@ -163,12 +163,21 @@ class OKFValidator:
             if not type_value:
                 errors.append("Document-level type field cannot be empty")
 
-        # Validate last_updated format (ISO 8601)
+        # Validate last_updated format (ISO 8601).
+        # PyYAML auto-parses an unquoted "2026-08-10T15:45:00Z" into a native
+        # datetime.datetime (and a bare date into datetime.date) instead of a str,
+        # so this must accept either — a real value here is not a validation error.
         if 'last_updated' in frontmatter_data:
-            try:
-                datetime.fromisoformat(frontmatter_data['last_updated'].replace('Z', '+00:00'))
-            except (ValueError, AttributeError):
-                errors.append(f"Invalid last_updated format: {frontmatter_data['last_updated']}")
+            value = frontmatter_data['last_updated']
+            if isinstance(value, (datetime,)):
+                pass  # already a valid timestamp
+            elif hasattr(value, 'isoformat') and not isinstance(value, str):
+                pass  # datetime.date or similar
+            else:
+                try:
+                    datetime.fromisoformat(str(value).replace('Z', '+00:00'))
+                except (ValueError, AttributeError):
+                    errors.append(f"Invalid last_updated format: {value}")
 
         # Validate sources structure
         if 'sources' in frontmatter_data:

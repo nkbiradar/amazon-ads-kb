@@ -179,9 +179,10 @@ class PipelineOrchestrator:
             # Add agent selection
             cmd.extend(["--agent", agent_name])
 
-            # Add JSON schema if provided
+            # Add JSON schema if provided. --json-schema only constrains output when
+            # combined with --output-format json (Claude Code CLI requirement).
             if json_schema:
-                cmd.extend(["--json-schema", json.dumps(json_schema)])
+                cmd.extend(["--output-format", "json", "--json-schema", json.dumps(json_schema)])
 
             # Add the task prompt
             cmd.append(task_prompt)
@@ -206,18 +207,40 @@ class PipelineOrchestrator:
                     self._log(f"STDOUT (partial): {result.stdout[:500]}")
                 return None
 
-            # Parse the output
             output = result.stdout.strip()
 
-            # Try to parse as JSON
-            try:
-                parsed_output = json.loads(output)
+            if json_schema:
+                # --output-format json wraps everything in an envelope:
+                # {"type":"result","is_error":bool,"result":"...","structured_output":{...matches schema...}, ...}
+                # The schema-conforming object lives under "structured_output", not "result".
+                try:
+                    envelope = json.loads(output)
+                except json.JSONDecodeError as e:
+                    self._log(f"{agent_name} agent: could not parse CLI envelope as JSON: {e}")
+                    self._log(f"STDOUT (partial): {output[:500]}")
+                    return None
+
+                if envelope.get("is_error"):
+                    self._log(f"{agent_name} agent returned an error: {envelope.get('result')}")
+                    return None
+
+                structured = envelope.get("structured_output")
+                if structured is None:
+                    self._log(f"{agent_name} agent: no structured_output in envelope; "
+                               f"result text: {str(envelope.get('result'))[:300]}")
+                    return None
+
                 self._log(f"{agent_name} agent returned structured JSON output successfully")
-                return parsed_output
-            except json.JSONDecodeError:
-                # If not JSON, return as plain text in a dict
-                self._log(f"{agent_name} agent returned text output (not JSON)")
-                return {"response": output, "raw": True}
+                return structured
+            else:
+                # No schema requested: --print returns plain text on stdout.
+                try:
+                    parsed_output = json.loads(output)
+                    self._log(f"{agent_name} agent returned structured JSON output successfully")
+                    return parsed_output
+                except json.JSONDecodeError:
+                    self._log(f"{agent_name} agent returned text output (not JSON)")
+                    return {"response": output, "raw": True}
 
         except subprocess.TimeoutExpired:
             self._log(f"Agent invocation timed out after 300 seconds")
@@ -404,8 +427,15 @@ class PipelineOrchestrator:
                 content = '\n'.join(content_parts[:150])  # Limit to first 150 meaningful elements
 
                 if not content or len(content.strip()) < 50:
-                    # If still empty, return raw HTML for debugging
-                    content = response.text[:5000]  # First 5000 chars of raw HTML
+                    # Structured tag extraction found nothing usable (e.g. content lives
+                    # in <div> soup with no <p>/<li>/etc). Fall back to soup.get_text(),
+                    # which is still script/style-stripped — never fall back to raw HTML,
+                    # that's how page JavaScript ends up captured as "facts".
+                    fallback_text = soup.get_text(separator=' ', strip=True)
+                    fallback_text = ' '.join(fallback_text.split())
+                    if fallback_text and len(fallback_text) >= 50:
+                        content = fallback_text[:5000]
+                        self._log(f"Used whole-page text fallback for {url} (no structured tags matched)")
 
                 if not content or len(content.strip()) < 50:
                     return None, "empty_content"
@@ -1019,44 +1049,151 @@ Validate these facts against existing knowledge and return validation report."""
                 "log_entry_added": False
             }
 
-        # Try to use Claude agent for intelligent merging
+        # The fuzzy call the Merger agent makes is topic assignment: does this fact
+        # belong to an existing document, or does it need a new one? Code then does
+        # the actual (deterministic, testable) file I/O based on that assignment.
+        # This is the split the brief asks for: "Fetch/parse/hash/validate/write are
+        # deterministic ... What's a concept, extracting facts, merging disagreements
+        # are fuzzy — Claude's job."
         if len(facts_to_process) <= 10:  # Use agent for smaller batches
+            existing_topics = self._list_existing_topics()
             facts_json = json.dumps(facts_to_process, indent=2)
+            topics_json = json.dumps(existing_topics, indent=2)
 
-            task_prompt = f"""VALIDATED FACTS TO MERGE:
+            task_prompt = f"""EXISTING DOCUMENT TOPICS IN knowledge/:
+{topics_json}
+
+VALIDATED FACTS TO MERGE:
 {facts_json}
 
-Merge these validated facts into OKF documents and return merge report."""
+For each fact, decide which document it belongs to. If it clearly matches an
+existing topic above (same Amazon Ads concept, not just similar wording), assign
+its exact filename and title. If it does not match anything existing, assign a
+new short kebab-case filename (e.g. "sponsored-display-guide.md") and a human
+title. Facts about the same concept must get the SAME filename so they land in
+one document, not near-duplicates. Return topic_assignments only."""
 
             json_schema = {
                 "type": "object",
                 "properties": {
-                    "merge_timestamp": {"type": "string"},
-                    "documents_created": {"type": "array"},
-                    "documents_updated": {"type": "array"},
-                    "index_updated": {"type": "boolean"},
-                    "log_entry_added": {"type": "boolean"}
-                }
+                    "topic_assignments": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "fact_index": {"type": "integer"},
+                                "filename": {"type": "string"},
+                                "title": {"type": "string"},
+                                "is_existing_document": {"type": "boolean"}
+                            },
+                            "required": ["fact_index", "filename", "title"]
+                        }
+                    }
+                },
+                "required": ["topic_assignments"]
             }
 
             result = self._invoke_claude_agent("merger", task_prompt, json_schema, use_custom_agent=True)
 
-            if result:
-                self._log(f"Merger agent completed merge operation")
-                # Actually create/update files based on agent response
-                self._execute_merger_operations(result, facts_to_process, conflict_rejected)
-                return result
+            if result and "topic_assignments" in result and result["topic_assignments"]:
+                self._log(f"Merger agent assigned {len(result['topic_assignments'])} fact(s) to topics")
+                return self._execute_merger_operations(result["topic_assignments"], facts_to_process, conflict_rejected)
+            else:
+                self._log(f"Merger agent produced no usable topic assignments, using fallback")
 
-        # Fallback to deterministic merging
+        # Fallback to deterministic merging (URL-based topic grouping)
         self._log(f"Using fallback deterministic merging")
         return self._fallback_merger(facts_to_process, conflict_rejected)
 
-    def _execute_merger_operations(self, agent_result: Dict, facts_to_process: List[Dict], conflict_rejected: List[Dict]) -> None:
-        """Execute the actual file operations based on agent guidance."""
-        self._log(f"Executing merger operations...")
+    def _list_existing_topics(self) -> List[Dict]:
+        """List existing knowledge/ documents (filename + title) for the merger agent's topic-matching context."""
+        topics = []
+        if not KNOWLEDGE_DIR.exists():
+            return topics
+        for md_file in KNOWLEDGE_DIR.glob("*.md"):
+            if md_file.name in ['index.md', 'log.md']:
+                continue
+            try:
+                with open(md_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                frontmatter, _ = self._extract_okf_parts(content)
+                topics.append({"filename": md_file.name, "title": frontmatter.get('title', md_file.stem)})
+            except Exception:
+                continue
+        return topics
 
-        # For now, use deterministic merging but log that agent was used
-        self._fallback_merger(facts_to_process, conflict_rejected)
+    def _execute_merger_operations(self, topic_assignments: List[Dict], facts_to_process: List[Dict], conflict_rejected: List[Dict]) -> Dict:
+        """Group facts by the merger agent's topic assignments and deterministically write OKF documents."""
+        self._log(f"Executing merger operations from agent topic assignments...")
+
+        # Build filename -> facts groups from the agent's fact_index -> filename mapping
+        by_filename: Dict[str, Dict] = {}
+        for assignment in topic_assignments:
+            idx = assignment.get("fact_index")
+            filename = assignment.get("filename")
+            title = assignment.get("title") or (filename.replace('.md', '').replace('-', ' ').title() if filename else None)
+            if idx is None or not filename or idx < 0 or idx >= len(facts_to_process):
+                continue
+            if not filename.endswith('.md'):
+                filename += '.md'
+            if filename not in by_filename:
+                by_filename[filename] = {"title": title, "facts": []}
+            by_filename[filename]["facts"].append(facts_to_process[idx])
+
+        # Any fact the agent didn't assign falls back to URL-based topic grouping
+        assigned_indices = {a.get("fact_index") for a in topic_assignments}
+        unassigned = [f for i, f in enumerate(facts_to_process) if i not in assigned_indices]
+        for topic, topic_facts in self._group_facts_by_topic(unassigned).items():
+            filename = self._generate_filename(topic)
+            by_filename.setdefault(filename, {"title": topic, "facts": []})["facts"].extend(topic_facts)
+
+        documents_created = []
+        documents_updated = []
+
+        rejected_sources_by_doc = {}
+        for rejected_fact in conflict_rejected:
+            related_doc = rejected_fact.get('related_document')
+            if related_doc:
+                rejected_sources_by_doc.setdefault(related_doc, []).append({
+                    'url': rejected_fact['source_url'],
+                    'type': rejected_fact['source_type'],
+                    'confidence': rejected_fact['confidence'],
+                    'reasoning': rejected_fact.get('reasoning', '')
+                })
+
+        for filename, group in by_filename.items():
+            doc_path = KNOWLEDGE_DIR / filename
+            topic_facts = group["facts"]
+            title = group["title"] or filename.replace('.md', '').replace('-', ' ').title()
+
+            if doc_path.exists():
+                self._update_document(doc_path, topic_facts)
+                if filename in rejected_sources_by_doc:
+                    self._add_rejected_sources_to_document(doc_path, rejected_sources_by_doc[filename])
+                documents_updated.append({"filename": filename, "title": title, "facts_added": len(topic_facts)})
+                self.stats["documents_updated"] += 1
+            else:
+                self._create_document(doc_path, title, topic_facts)
+                documents_created.append({"filename": filename, "title": title, "facts_included": len(topic_facts)})
+                self.stats["documents_created"] += 1
+
+        for filename, rejected_sources in rejected_sources_by_doc.items():
+            doc_path = KNOWLEDGE_DIR / filename
+            already_touched = filename in by_filename
+            if doc_path.exists() and not already_touched:
+                self._add_rejected_sources_to_document(doc_path, rejected_sources)
+                documents_updated.append({"filename": filename, "title": doc_path.stem.replace('-', ' ').title(), "facts_added": 0})
+                self.stats["documents_updated"] += 1
+
+        self._update_index()
+
+        return {
+            "merge_timestamp": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "documents_created": documents_created,
+            "documents_updated": documents_updated,
+            "index_updated": True,
+            "log_entry_added": True
+        }
 
     def _fallback_merger(self, facts_to_process: List[Dict], conflict_rejected: List[Dict]) -> Dict:
         """Fallback merger method using deterministic document creation."""
@@ -1345,23 +1482,40 @@ sources:
             self._log(f"Error adding rejected sources to {doc_path.name}: {e}")
 
     def _parse_sources_from_frontmatter(self, content: str) -> List[Dict]:
-        """Parse sources from existing frontmatter."""
+        """Parse sources from existing frontmatter, preserving each source's real type/confidence."""
         sources = []
         lines = content.split('\n')
 
         in_sources = False
+        current = None
         for line in lines:
-            if line.strip() == 'sources:':
+            stripped = line.strip()
+
+            if stripped == 'sources:':
                 in_sources = True
                 continue
 
-            if in_sources and line.strip().startswith('- url:'):
-                url = line.split(':', 1)[1].strip().strip('"')
-                # Look ahead for type and confidence
-                sources.append({'url': url, 'type': 'official', 'confidence': 'high'})
+            if not in_sources:
+                continue
 
-            if in_sources and not line.startswith(' '):
+            # A new top-level frontmatter key (no leading indentation) ends the sources block
+            if line and not line.startswith(' ') and stripped != 'sources:':
+                if current:
+                    sources.append(current)
                 break
+
+            if stripped.startswith('- url:'):
+                if current:
+                    sources.append(current)
+                url = stripped.split(':', 1)[1].strip().strip('"\'')
+                current = {'url': url, 'type': 'official', 'confidence': 'high'}
+            elif current is not None and stripped.startswith('type:'):
+                current['type'] = stripped.split(':', 1)[1].strip().strip('"\'')
+            elif current is not None and stripped.startswith('confidence:'):
+                current['confidence'] = stripped.split(':', 1)[1].strip().strip('"\'')
+
+        if current and current not in sources:
+            sources.append(current)
 
         return sources
 

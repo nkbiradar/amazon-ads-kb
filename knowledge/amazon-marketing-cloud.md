@@ -25,6 +25,18 @@ AMC provides advertisers with a comprehensive solution for:
 - Secure analytics without data movement [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
 <!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
+## Additional Facts
+
+- AMC audiences can be directly activated for media buying across sponsored ads, video ads, and display ads [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T20:09:22Z" -->
+- AMC Paid Features are in beta status [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T20:09:22Z" -->
+- AMC includes curated analytic and audience templates [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T20:09:22Z" -->
+- AMC supports SQL-less insight generation and visualization [¹](https://advertising.amazon.com/solutions/products/amazon-marketing-cloud)
+<!-- provenance: source_url="https://advertising.amazon.com/solutions/products/amazon-marketing-cloud" source_type="official" confidence="high" last_checked="2026-08-13T20:09:22Z" -->
+<!-- merged from products-amazon-marketing-cloud.md, same source URL, during doc consolidation 2026-08-16 -->
+
 ## Core Capabilities
 
 ### Data Clean Room Technology

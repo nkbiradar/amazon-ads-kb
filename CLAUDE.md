@@ -72,20 +72,31 @@ amazon-ads-kb/
 
 ## Running the Pipeline
 
-Start the knowledge acquisition pipeline:
+`scripts/pipeline.py` is the orchestrator — it runs deterministic stages
+(fetch, hash, write) directly and shells out to `claude` for the fuzzy stages
+(extraction, validation, topic assignment), using the subagent definitions in
+`.claude/agents/`:
+
 ```bash
 # Trigger full pipeline run
-claude --prompt "Run knowledge acquisition pipeline"
+python scripts/pipeline.py --config sources/seed-urls.json
 
-# Run specific stage
-claude --prompt "Run Scout stage"
-claude --prompt "Run Extractor stage"
+# Single source
+python scripts/pipeline.py --url "https://advertising.amazon.com/help" --type official
 ```
+
+There is no `claude --prompt` flag — `claude`'s non-interactive flag is
+`-p`/`--print`, and `scripts/pipeline.py` calls it directly via `subprocess`
+(see `_invoke_claude_agent`), rather than a human typing a prompt into the
+CLI stage by stage.
 
 Inspect pipeline status:
 ```bash
-# Check last run timestamp
-cat sources/.last-run
+# Every run appends a real entry here (written by code, not by hand)
+tail -40 knowledge/log.md
+
+# Per-source hash/fetch history
+cat sources/sources.json
 
 # View pending changes
 git diff knowledge/

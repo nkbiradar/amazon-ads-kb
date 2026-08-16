@@ -24,26 +24,26 @@ This system automatically builds and maintains a comprehensive knowledge base ab
 
 ### Required Software
 
-- **Node.js** (v16+) - For hash checking and validation scripts
-- **Python** (v3.8+) - For pipeline orchestration
+- **Node.js** (v16+) - Runs `scripts/validate-okf.js`, the OKF format hook
+- **Python** (v3.8+) - Runs `scripts/pipeline.py`, the orchestrator
 - **Git** - For version control
-- **Claude Code** - Main orchestration platform
+- **Claude Code CLI** - `claude` must be on your PATH and logged in; the pipeline shells out to it for extraction, validation, and topic-assignment (see `_invoke_claude_agent` in `scripts/pipeline.py`)
 
-### Required MCP Servers
+### Python dependencies
 
-This project requires these Model Context Protocol (MCP) servers:
+```bash
+pip install -r requirements.txt
+```
 
-1. **Playwright MCP** - For web page content fetching
-   ```bash
-   npx -y @executeautomation/playwright-mcp-server
-   ```
+There is no `package.json` — nothing here is an npm package. `node` is only
+used to run `scripts/validate-okf.js` directly (`node scripts/validate-okf.js`),
+not as part of any Node build/install step.
 
-2. **Web Reader MCP** - For URL content extraction
-   ```bash
-   npx -y @modelcontextprotocol/server-web-reader
-   ```
-
-3. **Search MCP** - For source discovery (optional but recommended)
+Content fetching is done with the Python `requests` + `beautifulsoup4`
+libraries directly (see `fetch_content()` in `scripts/pipeline.py`) — there
+is no MCP server (Playwright, web-reader, or otherwise) in the fetch path.
+If you want to swap in an MCP-based fetcher later, `fetch_content()` is the
+single place to change.
 
 ## 🚀 Setup Steps
 
@@ -54,49 +54,26 @@ git clone <repository-url>
 cd amazon-ads-kb
 ```
 
-### Step 2: Install Node.js Dependencies
+### Step 2: Install Python Dependencies
 
 ```bash
-npm install
+pip install -r requirements.txt
 ```
 
-### Step 3: Install MCP Servers
-
-Install and configure the required MCP servers:
+### Step 3: Log in to Claude Code
 
 ```bash
-# Install Playwright MCP server
-npm install -g @executeautomation/playwright-mcp-server
-
-# Install Web Reader MCP server  
-npm install -g @modelcontextprotocol/server-web-reader
+claude /login
 ```
 
-### Step 4: Configure Claude Code Settings
+The pipeline calls `claude -p ... --agent <name> --agents <custom-def> --output-format json --json-schema <schema>` per source (see `_invoke_claude_agent`). If you're on a proxied endpoint (e.g. a LiteLLM gateway) rather than api.anthropic.com directly, copy `.claude/settings.json.example`'s `env` block into `.claude/settings.local.json` and fill in your token — don't put real tokens in `.claude/settings.json`, it's committed.
 
-Update your Claude Code settings file (usually at `~/.claude/settings.json` or project `.claude/settings.json`) to include the MCP servers:
-
-```json
-{
-  "mcpServers": {
-    "playwright": {
-      "command": "npx",
-      "args": ["-y", "@executeautomation/playwright-mcp-server"]
-    },
-    "web-reader": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-web-reader"]
-    }
-  }
-}
-```
-
-### Step 5: Verify Setup
+### Step 4: Verify Setup
 
 ```bash
 # Check that required files exist
 ls .claude/agents/
-ls .claude/skills/  
+ls .claude/skills/
 ls scripts/
 ls sources/
 
@@ -104,11 +81,12 @@ ls sources/
 python scripts/hash_check.py "https://example.com" "test content"
 # Should return: "new"
 
-# Test OKF validation
-node scripts/validate-okf.js
+# Test OKF validation directly (the hook receives this same JSON shape on stdin)
+echo '{"tool_name":"Write","tool_input":{"file_path":"knowledge/x.md","content":"---\ntitle: \"X\"\nlast_updated: 2026-01-01T00:00:00Z\ntype: knowledge\nsources:\n  - url: \"https://example.com\"\n    type: official\n    confidence: high\n---\n\nbody"}}' | node scripts/validate-okf.js; echo "exit: $?"
+# Should print nothing and exit 0 (valid). Drop the "type:" line to see exit 2 + a JSON denial reason.
 ```
 
-### Step 6: Configure Seed URLs (Optional)
+### Step 5: Configure Seed URLs (Optional)
 
 Edit `sources/seed-urls.json` with your desired Amazon Ads sources:
 
@@ -201,16 +179,9 @@ amazon-ads-kb/
 # List files in knowledge directory
 ls knowledge/
 
-# Expected output after first run (with 3 sources):
-# amazon-ads-help-center.md
-# amazon-ads-api-resources.md  
-# amazon-ppc-campaign-guide.md
-# index.md
-# log.md
-
-# Count total files
-ls knowledge/ | wc -l
-# Should show: 5 (3 OKF docs + 2 system files)
+# knowledge/ always contains index.md + log.md plus one .md per topic.
+# Count topic documents (excludes index.md and log.md):
+ls knowledge/*.md | grep -v -e index.md -e log.md | wc -l
 ```
 
 ### 2. Verify Document Quality
@@ -249,12 +220,20 @@ cat knowledge/index.md
 # Check the pipeline run log
 tail -50 knowledge/log.md
 
-# Should show entries for each pipeline run with:
-# - Timestamp (e.g., ## [Full Pipeline Run] 2026-08-10T15:45:00Z)
-# - Sources processed
-# - Documents created/updated
-# - Statistics (facts extracted, sources added, etc.)
-# - Summary of changes
+# Every entry is written by _write_summary() in scripts/pipeline.py, in this
+# exact format — if you ever see an entry that doesn't look like this, it
+# was added by hand, not by the pipeline:
+# ## Pipeline Run: 2026-08-16T12:00:00Z
+#
+# **Duration**: 12.34 seconds
+# **Sources Processed**: 2
+# **Sources Skipped**: 1
+# **Sources Failed**: 0
+#
+# **Statistics**:
+# - Facts extracted: 9
+# - Facts new: 7
+# ...
 ```
 
 ### 5. Verify Hash Tracking
@@ -284,19 +263,22 @@ tail -20 knowledge/log.md
 
 ## 🔍 Troubleshooting
 
-### MCP Servers Not Connecting
+### Agent stages return nothing / pipeline falls back to deterministic extraction every time
 
-**Problem**: Pipeline fails with MCP connection errors
+**Problem**: Log shows `Extractor agent failed, using fallback extraction` (or validator/merger equivalents) on every run.
 
-**Solution**: 
+**Solution**:
 ```bash
-# Test MCP servers individually
-npx @executeautomation/playwright-mcp-server --status
-npx @modelcontextprotocol/server-web-reader --status
+# Confirm claude is on PATH and logged in
+claude -p "say ok" --output-format json
+# is_error should be false; if it says "Not logged in", run: claude /login
 
-# Restart Claude Code after MCP installation
-# Verify MCP configuration in settings.json
+# Confirm the agent definition loads
+cat .claude/agents/extractor.md
 ```
+The fallback exists so a broken `claude` install doesn't stop the pipeline —
+but if you only ever see fallback-quality facts, this is why. It is NOT
+silent: every fallback is logged.
 
 ### Hash Check Script Fails
 
@@ -360,19 +342,21 @@ topic_id: document-slug
 # Clone and setup
 git clone <repo-url>
 cd amazon-ads-kb
-npm install
+pip install -r requirements.txt
+claude /login   # if not already logged in
 
 # Run first pipeline
 python scripts/pipeline.py --config sources/seed-urls.json
 
 # Verify results
 ls knowledge/                    # Check files created
-cat knowledge/log.md             # Review pipeline log
+cat knowledge/log.md             # Review pipeline log (real entries only)
 cat knowledge/index.md           # Check knowledge index
 
 # Test re-run safety
 python scripts/pipeline.py --config sources/seed-urls.json
-ls knowledge/ | wc -l             # Should still be 5 files
+# knowledge/ file count should be unchanged; log.md's newest entry should
+# show Sources Skipped == however many sources were enabled and unchanged
 ```
 
 ## 🔧 Advanced Configuration
@@ -425,13 +409,12 @@ MIT-0 License - See LICENSE file for details
 
 For issues with:
 - **Claude Code**: Check Claude Code documentation
-- **MCP Servers**: Check respective MCP server documentation
+- **Fetching**: `fetch_content()` in `scripts/pipeline.py` (plain `requests` + BeautifulSoup, no MCP)
 - **Pipeline Logic**: Review agent definitions in `.claude/agents/`
 
 ---
 
-**Status**: ✅ Production Ready  
-**Last Updated**: 2026-08-13  
-**Version**: 1.0.0
+**Status**: Working prototype, not production-ready — see `RUN.md` for what's verified and what isn't, and the design document for known limitations.
+**Last Updated**: 2026-08-16
 
-**Quick Verification**: After setup, run `ls knowledge/` and `cat knowledge/log.md` to confirm successful pipeline execution.
+**Quick Verification**: See `RUN.md` for a real command + real output, not just `ls knowledge/`.

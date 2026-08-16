@@ -9,27 +9,20 @@ pass/fail result matches what's expected for each case.
 USAGE:
     python run_error_handling_tests.py
 
-CONFIGURE:
-    Edit VALIDATOR_CMD below to match how your validator is actually
-    invoked (path to script + any flags). It's currently assumed to:
-      - take a single file path as its argument
-      - exit with code 0 on success, non-zero on validation failure
-    If your validator instead prints "PASS"/"FAIL" to stdout regardless
-    of exit code, tweak `ran_ok()` accordingly (see comment inline).
+This calls scripts/validate-okf.js exactly the way Claude Code's PreToolUse
+hook calls it in production: a JSON tool-invocation payload on stdin
+(`{"tool_name": "Write", "tool_input": {"file_path": ..., "content": ...}}`),
+no CLI arguments. Exit code 0 = allowed (valid OKF), exit code 2 = blocked
+(invalid OKF) — see scripts/validate-okf.js and .claude/settings.json.
 """
 
+import json
 import subprocess
 import sys
 from pathlib import Path
 
-# ---- CONFIGURE THIS ----
-# Example if it's a python script: ["python", "validate_okf.py"]
-# Example if it's a node script:   ["node", "validate_okf.js"]
-# Example if it's a Claude Code agent/CLI wrapper, replace accordingly.
-# Get the repository root by going up from the test suite directory
 REPO_ROOT = Path(__file__).parent.parent
 VALIDATOR_CMD = ["node", str(REPO_ROOT / "scripts" / "validate-okf.js")]
-# -------------------------
 
 TEST_DIR = Path(__file__).parent / "test-cases"
 
@@ -46,18 +39,27 @@ EXPECTATIONS = {
     "08-malformed-citation-format.md": False,
     "09-empty-file.md": False,
     "10-no-content-body.md": False,
+    "11-missing-type.md": False,
 }
 
 
 def ran_ok(filepath: Path) -> tuple[bool, str]:
     """
-    Runs the validator against a single file.
+    Runs the validator against a single file, simulating a Write tool call
+    with that file's content — the real PreToolUse invocation shape.
     Returns (passed, details) where passed=True means the validator
-    considered the file VALID (exit code 0).
+    considered the file VALID (exit code 0; exit code 2 blocks).
     """
+    content = filepath.read_text(encoding='utf-8')
+    tool_invocation = json.dumps({
+        "tool_name": "Write",
+        "tool_input": {"file_path": str(filepath), "content": content}
+    })
+
     try:
         result = subprocess.run(
-            VALIDATOR_CMD + [str(filepath)],
+            VALIDATOR_CMD,
+            input=tool_invocation,
             capture_output=True,
             text=True,
             timeout=30,

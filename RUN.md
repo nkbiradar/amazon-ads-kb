@@ -134,18 +134,25 @@ Each fact includes:
 python scripts/test_okf_validation.py
 ```
 
-**Expected:** All knowledge documents pass validation (26/26 PASS)
+**Expected:** All knowledge documents pass validation, N/N PASS (N = however
+many `.md` files are in `knowledge/` excluding `index.md`/`log.md` — 13 after
+the 2026-08-16 consolidation described in `knowledge/index.md`, until you
+delete the 13 leftover files listed there, in which case it'll read 26/26)
 
 ### 2. Error-Handling Test
 ```bash
 python okf-test-suite/run_error_handling_tests.py
 ```
 
-**Expected:** 11/11 test cases pass
+**Expected:** 12/12 test cases pass (11 original + 1 isolating the type-field rule specifically, added 2026-08-16)
 
 ### 3. Direct Document Validation
 ```bash
-node scripts/validate-okf.js knowledge/products-sponsored-products.md
+cat knowledge/products-sponsored-products.md | python3 -c "
+import json, sys
+content = sys.stdin.read()
+print(json.dumps({'tool_name':'Write','tool_input':{'file_path':'knowledge/products-sponsored-products.md','content':content}}))
+" | node scripts/validate-okf.js
 ```
 
 **Expected:** No output (success), or validation results
@@ -251,7 +258,7 @@ All documents validated before writing:
 **Required Frontmatter:**
 - `title` — Document title
 - `last_updated` — ISO timestamp
-- `type` — Must be "knowledge"
+- `type` — Non-empty string; the pipeline always writes `knowledge`, but `scripts/validate-okf.js` accepts any non-empty value (the OKF v0.1 rule is "present and non-empty", not a fixed enum)
 - `sources` — Array of source objects
 - `topic_id` — Document identifier
 
@@ -295,8 +302,13 @@ if sources.exists():
 # Verify document has required frontmatter
 head -15 knowledge/<problematic-file>.md
 
-# Run validation manually for details
-node scripts/validate-okf.js knowledge/<problematic-file>.md
+# Run validation manually for details — the hook reads a tool-invocation JSON
+# from stdin, it does not take a file path argument:
+python3 -c "
+import json
+content = open('knowledge/<problematic-file>.md', encoding='utf-8').read()
+print(json.dumps({'tool_name':'Write','tool_input':{'file_path':'knowledge/<problematic-file>.md','content':content}}))
+" | node scripts/validate-okf.js; echo "exit: $?"
 ```
 
 ### Agent Errors
@@ -330,9 +342,9 @@ Use this checklist to verify system functionality:
 - [ ] Facts include inline citations `[¹](url)` format
 - [ ] Facts include provenance metadata (source_url, source_type, confidence, last_checked)
 - [ ] No JavaScript/tracking code in facts (grep for "function(", "var ue_csm" returns 0)
-- [ ] OKF validation passes: `python scripts/test_okf_validation.py` shows 26/26 PASS
-- [ ] Error-handling tests pass: `python okf-test-suite/run_error_handling_tests.py` shows 11/11 PASS
-- [ ] Direct validation works: `node scripts/validate-okf.js knowledge/<any-doc>.md`
+- [ ] OKF validation passes: `python scripts/test_okf_validation.py` shows N/N PASS
+- [ ] Error-handling tests pass: `python okf-test-suite/run_error_handling_tests.py` shows 12/12 PASS
+- [ ] Direct validation works: pipe a `{"tool_name":"Write","tool_input":{...}}` JSON payload to `node scripts/validate-okf.js` (see Troubleshooting above) — exit 0 valid, exit 2 blocked
 - [ ] Rerun safety verified: Second pipeline run skips unchanged sources
 - [ ] Hash tracking working: `sources/sources.json` contains content_hash entries
 - [ ] Index updated: `knowledge/index.md` lists all documents
@@ -361,7 +373,11 @@ grep "Sources skipped" knowledge/log.md | tail -1
 # 5. Run validation tests
 python scripts/test_okf_validation.py
 python okf-test-suite/run_error_handling_tests.py
-node scripts/validate-okf.js knowledge/products-sponsored-products.md
+cat knowledge/products-sponsored-products.md | python3 -c "
+import json, sys
+content = sys.stdin.read()
+print(json.dumps({'tool_name':'Write','tool_input':{'file_path':'knowledge/products-sponsored-products.md','content':content}}))
+" | node scripts/validate-okf.js
 
 # 6. Quality checks
 grep -r "function(" knowledge/*.md | wc -l  # Should be 0
@@ -378,6 +394,53 @@ git status --short
 - **CLAUDE.md** — Project scope and architecture
 - **.claude/agents/** — Individual agent definitions
 - **.claude/skills/** — Reusable skills (OKF format, deduplication, citation rules)
+
+---
+
+## What's actually been verified, and what you need to verify yourself
+
+Being specific about this on purpose — a prior version of this file (and of
+`knowledge/log.md`) described pipeline behavior that didn't match what the
+code did. Here's what was actually run, live, with real output, and what
+still needs a run on a machine with an authenticated `claude` CLI and open
+network access to advertising.amazon.com (neither was available in the
+environment these fixes were made in):
+
+**Verified live, 2026-08-16:**
+- `python scripts/test_okf_validation.py` — ran clean, real output: 26/26
+  documents pass (including the regression tests for the `type` field).
+  Before this fix it crashed with a `TypeError` on every real document,
+  because PyYAML parses an unquoted `2026-08-10T15:45:00Z` as a
+  `datetime.datetime`, not a `str` — `test_okf_validation.py` now handles
+  both.
+- `python okf-test-suite/run_error_handling_tests.py` — ran clean, real
+  output: 12/12 (11 original cases + 1 new one isolating the type-field rule
+  from every other rule). This suite previously hung indefinitely, because it
+  called `validate-okf.js <file>` as a CLI argument while the script only
+  reads stdin — fixed to send the same JSON payload Claude Code's PreToolUse
+  hook actually sends.
+- `echo '<Write payload without a type field>' | node scripts/validate-okf.js`
+  — exit code 2, JSON denial reason printed. With the field present, exit 0,
+  nothing printed. Ran both directly.
+- `python scripts/pipeline.py --url "https://advertising.amazon.com/help" --type official`
+  — ran in a sandbox with no outbound access to advertising.amazon.com and no
+  logged-in `claude`. It retried 3x with backoff, failed cleanly, and wrote a
+  real (not fabricated) entry to `knowledge/log.md`. This proves the error
+  path; it does NOT prove the extractor/validator/merger agent calls work
+  end-to-end, because they never got the chance to run.
+
+**Not verified — needs to be run by whoever has `claude` logged in and
+network access, and the real output pasted here:**
+- A full pipeline run against a live source, showing the extractor/validator/
+  merger agents actually being invoked (`claude --print --agent ... --agents
+  ... --output-format json --json-schema ...` in the log) and a document
+  being created or updated from real agent output — not the deterministic
+  fallback. If you only see fallback log lines, check `claude -p "say ok"
+  --output-format json` first (see README Troubleshooting).
+- A transcript proving the PreToolUse hook fires inside an actual Claude Code
+  session (not just the validator script run directly) — e.g. ask Claude Code
+  to write a `knowledge/*.md` file missing `type` and confirm it's blocked.
+- Re-run safety on a real second run (`Sources Skipped` > 0, no new files).
 
 ---
 

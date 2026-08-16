@@ -20,9 +20,15 @@ Holiday and seasonal marketing with sponsored ads helps integrate advertising in
 
 ### Major Holiday Periods
 - **Prime Day**: Amazon's exclusive shopping event
-- **Black Friday/Cyber Monday**: Holiday shopping kickoff
-- **Christmas/Holiday Season**: Gift-giving peak period
+- **Black Friday/Cyber Monday**: Holiday shopping kickoff — Black Friday November 25, Cyber Monday November 28 [¹](https://advertising.amazon.com/library/guides/guide-to-holiday-marketing-with-sponsored-ads)
+<!-- provenance: source_url="https://advertising.amazon.com/library/guides/guide-to-holiday-marketing-with-sponsored-ads" source_type="official" confidence="high" last_checked="2026-08-13T20:10:26Z" -->
+- **Christmas/Holiday Season**: Gift-giving peak period — Christmas is December 25 [¹](https://advertising.amazon.com/library/guides/guide-to-holiday-marketing-with-sponsored-ads)
+<!-- provenance: source_url="https://advertising.amazon.com/library/guides/guide-to-holiday-marketing-with-sponsored-ads" source_type="official" confidence="high" last_checked="2026-08-13T20:10:26Z" -->
 - **New Year**: Resolution-based shopping
+
+Amazon Ads managed services (Amazon running the campaign on an advertiser's behalf) require budget minimums. [¹](https://advertising.amazon.com/library/guides/guide-to-holiday-marketing-with-sponsored-ads)
+<!-- provenance: source_url="https://advertising.amazon.com/library/guides/guide-to-holiday-marketing-with-sponsored-ads" source_type="official" confidence="high" last_checked="2026-08-13T20:10:26Z" -->
+<!-- merged from guide-to-holiday-marketing-with-sponsored-ads.md, same source URL, during doc consolidation 2026-08-16 -->
 - **Back to School**: Educational seasonal shopping
 - **Summer Sales**: Mid-year clearance events [¹](https://advertising.amazon.com/library/guides/guide-to-holiday-marketing-with-sponsored-ads)
 <!-- provenance: source_url="https://advertising.amazon.com/library/guides/guide-to-holiday-marketing-with-sponsored-ads" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->

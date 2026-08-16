@@ -1,0 +1,48 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python scripts/pipeline.py *)",
+      "Bash(python3 scripts/pipeline.py *)",
+      "Bash(python scripts/hash_check.py *)",
+      "Bash(python3 scripts/hash_check.py *)",
+      "Bash(python scripts/test_okf_validation.py)",
+      "Bash(python3 scripts/test_okf_validation.py)",
+      "Bash(python okf-test-suite/run_error_handling_tests.py)",
+      "Bash(python3 okf-test-suite/run_error_handling_tests.py)",
+      "Bash(node scripts/validate-okf.js)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git log *)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["scripts/validate-okf.js"],
+            "if": "Write(knowledge/*)",
+            "timeout": 30,
+            "statusMessage": "Validating OKF format..."
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["scripts/validate-okf.js"],
+            "if": "Edit(knowledge/*)",
+            "timeout": 30,
+            "statusMessage": "Validating OKF format..."
+          }
+        ]
+      }
+    ]
+  }
+}

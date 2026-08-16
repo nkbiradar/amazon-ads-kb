@@ -6,29 +6,44 @@
  * Validates that a file has proper OKF v0.1 frontmatter before allowing writes.
  * Called by PreToolUse hook for knowledge/ directory writes.
  *
- * Usage: node validate-okf.js <file_path>
- * Returns: 0 if valid, 1 if invalid
+ * Reads tool invocation JSON from stdin:
+ * {
+ *   "tool_name": "Write" | "Edit",
+ *   "tool_input": {
+ *     "file_path": "...",
+ *     "content": "...",  // for Write
+ *     "new_string": "..."  // for Edit
+ *   }
+ * }
+ *
+ * Returns: 0 if valid, 2 if invalid (blocks the tool call)
  */
 
 const fs = require('fs');
 const path = require('path');
 
-// Get file path from command line argument
-const filePath = process.argv[2];
-
-// Check if file path was provided
-if (!filePath) {
-  console.error('Error: No file path provided');
-  console.error('Usage: node validate-okf.js <file_path>');
+// Read tool invocation from stdin
+let toolInvocation;
+try {
+  const stdinBuffer = fs.readFileSync(0, 'utf-8'); // Read from stdin (fd 0)
+  toolInvocation = JSON.parse(stdinBuffer);
+} catch (error) {
+  console.error('Error: Cannot read tool invocation from stdin:', error.message);
   process.exit(1);
 }
 
-// Read file content
+// Extract content based on tool type
 let fileContent;
-try {
-  fileContent = fs.readFileSync(filePath, 'utf8');
-} catch (error) {
-  console.error(`Error: Cannot read file '${filePath}': ${error.message}`);
+const toolName = toolInvocation.toolName || toolInvocation.tool_name;
+const toolInput = toolInvocation.toolInput || toolInvocation.tool_input;
+
+if (toolName === 'Write') {
+  fileContent = toolInput.content;
+} else if (toolName === 'Edit') {
+  fileContent = toolInput.new_string;
+} else {
+  console.error(`Error: Unexpected tool name: ${toolName}`);
+  console.error('Input received:', JSON.stringify(toolInvocation, null, 2));
   process.exit(1);
 }
 
@@ -191,10 +206,19 @@ const errors = validateOKFFrontmatter(fileContent);
 validateOKFBody(fileContent, errors);
 
 if (errors.length > 0) {
-  // Output errors to stderr
-  console.error('OKF Frontmatter Validation Failed:');
-  errors.forEach(error => console.error('  - ' + error));
-  process.exit(1);
+  // Output JSON decision to deny the tool use
+  const errorOutput = {
+    hookSpecificOutput: {
+      hookEventName: 'PreToolUse',
+      permissionDecision: 'deny',
+      permissionDecisionReason: 'OKF frontmatter validation failed: ' + errors.join('; ')
+    },
+    systemMessage: 'OKF validation failed. Document must have valid frontmatter with: title, last_updated, type, and sources array.'
+  };
+
+  console.log(JSON.stringify(errorOutput, null, 2));
+  process.exit(2); // Exit code 2 blocks the tool call
 } else {
+  // Allow the tool use (exit 0 means no decision, normal permission flow applies)
   process.exit(0);
 }

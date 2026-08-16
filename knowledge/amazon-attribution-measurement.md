@@ -50,6 +50,11 @@ Amazon Attribution uses attribution tags placed in destination URLs to track cus
 
 ### Integration with Amazon Ads API
 Amazon Attribution is available in the Amazon Ads API, enabling programmatic access to metrics within the tool and streamlined measurement activities. [¹](https://advertising.amazon.com/en-ca/library/guides/basics-of-amazon-attribution)
+<!-- provenance: source_url="https://advertising.amazon.com/en-ca/library/guides/basics-of-amazon-attribution" source_type="official" confidence="high" last_checked="2026-08-13T20:09:09Z" -->
+
+Amazon Attribution also provides downloadable product reports for performance analysis. [¹](https://advertising.amazon.com/en-ca/library/guides/basics-of-amazon-attribution)
+<!-- provenance: source_url="https://advertising.amazon.com/en-ca/library/guides/basics-of-amazon-attribution" source_type="official" confidence="high" last_checked="2026-08-13T20:09:09Z" -->
+<!-- merged from en-ca-basics-of-amazon-attribution.md and basics-of-amazon-attribution.md (US locale variant, no unique facts), same guide, during doc consolidation 2026-08-16 -->
 <!-- provenance: source_url="https://advertising.amazon.com/en-ca/library/guides/basics-of-amazon-attribution" source_type="official" confidence="high" last_checked="2026-08-13T18:55:27Z" -->
 
 ## Benefits and Use Cases
